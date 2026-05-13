@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' cdn.jsdelivr.net; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'none';">
+  <meta http-equiv="X-Frame-Options" content="DENY">
+  <title>Data Gallery</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="site-header">
+    <h1>Data Gallery</h1>
+  </header>
+
+  <nav class="main-tabs" id="mainTabs" aria-label="메인 카테고리">
+    <button type="button" class="main-tab active" data-main="graph">📊 그래프</button>
+    <button type="button" class="main-tab" data-main="dduktak">⚡ 뚝딱!</button>
+  </nav>
+
+  <div id="sectionGraph">
+    <nav class="category-tabs" id="categoryTabs" aria-label="카테고리"></nav>
+
+    <!-- ADSENSE_BANNER -->
+    <div style="width: 728px; max-width: calc(100vw - 16px); height: 90px; margin: 16px auto; background: #f9fafb; border: 1px solid #e5e7eb; display: flex; align-items: center; justify-content: center; color: #9ca3af; font-size: 12px;">Advertisement</div>
+
+    <main>
+      <section class="card-grid" id="cardGrid" aria-label="차트 목록"></section>
+    </main>
+  </div>
+
+  <div id="sectionDduktak" style="display: none;">
+    <nav class="sub-tabs" id="subTabs" aria-label="뚝딱 서브 카테고리">
+      <button type="button" class="sub-tab active" data-sub="recommend">🔍 뚝딱! 그래프 추천</button>
+      <button type="button" class="sub-tab" data-sub="make">🛠 뚝딱! 그래프 만들기</button>
+    </nav>
+
+    <div id="subRecommend">
+      <div class="dduktak-container">
+        <div class="dduktak-hero">
+          <h2>어떤 데이터를 시각화할까요?</h2>
+          <textarea id="dduktakInput" maxlength="140" placeholder="예) 월별 매출, 지역별 인구 비교, 사용자 연령대 분포..."></textarea>
+          <div class="dduktak-meta">
+            <span><span id="dduktakCount">0</span> / 140</span>
+            <span class="dduktak-hint">한글 약 30자 / 영문 약 70자</span>
+          </div>
+          <button type="button" id="dduktakBtn" class="dduktak-btn">⚡ 뚝딱! 추천받기</button>
+        </div>
+
+        <div class="dduktak-results" id="dduktakResults" style="display: none;">
+          <h2>TOP 3 추천</h2>
+          <div class="dduktak-cards" id="dduktakTop3"></div>
+          <h3>기타 추천</h3>
+          <div class="dduktak-etc" id="dduktakEtc"></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="subMake" style="display: none;">
+      <div class="dduktak-prep">
+        <div class="dduktak-prep-emoji">🛠️</div>
+        <div class="dduktak-prep-text">준비 중입니다</div>
+        <div class="dduktak-prep-sub">뚝딱! 그래프 만들기는 곧 만나보실 수 있어요.</div>
+      </div>
+    </div>
+  </div>
+
+  <script src="data/charts.js"></script>
+  <script src="js/thumbnails.js"></script>
+  <script src="js/main.js"></script>
+  <script>
+    (function () {
+      const grid = document.getElementById("cardGrid");
+      if (!grid) return;
+      function fillThumbs() {
+        grid.querySelectorAll(".card").forEach((card) => {
+          const thumb = card.querySelector(".card-thumb");
+          if (thumb && !thumb.firstChild) {
+            thumb.innerHTML = getThumbnail(card.dataset.id);
+          }
+        });
+      }
+      fillThumbs();
+      new MutationObserver(fillThumbs).observe(grid, { childList: true });
+    })();
+  </script>
+
+  <script>
+    // 메인 탭 전환
+    (function () {
+      const mainTabs = document.getElementById("mainTabs");
+      const sectionGraph = document.getElementById("sectionGraph");
+      const sectionDduktak = document.getElementById("sectionDduktak");
+      mainTabs.addEventListener("click", (e) => {
+        const btn = e.target.closest(".main-tab");
+        if (!btn) return;
+        mainTabs.querySelectorAll(".main-tab").forEach((b) => b.classList.remove("active"));
+        btn.classList.add("active");
+        const which = btn.dataset.main;
+        sectionGraph.style.display = which === "graph" ? "" : "none";
+        sectionDduktak.style.display = which === "dduktak" ? "" : "none";
+      });
+    })();
+
+    // 뚝딱! 서브 탭 전환
+    (function () {
+      const subTabs = document.getElementById("subTabs");
+      const subRecommend = document.getElementById("subRecommend");
+      const subMake = document.getElementById("subMake");
+      subTabs.addEventListener("click", (e) => {
+        const btn = e.target.closest(".sub-tab");
+        if (!btn) return;
+        subTabs.querySelectorAll(".sub-tab").forEach((b) => b.classList.remove("active"));
+        btn.classList.add("active");
+        const which = btn.dataset.sub;
+        subRecommend.style.display = which === "recommend" ? "" : "none";
+        subMake.style.display = which === "make" ? "" : "none";
+      });
+    })();
+
+    // 뚝딱! 그래프 추천 로직
+    (function () {
+      const KEYWORD_MAP = [
+        { kws: ["매출", "판매", "비교", "순위", "차이", "compare", "rank"], cats: ["비교", "추세"] },
+        { kws: ["비율", "구성", "퍼센트", "%", "점유율", "ratio", "share"], cats: ["구성", "비율"] },
+        { kws: ["분포", "분산", "히스토그램", "distribution", "spread"], cats: ["분포"] },
+        { kws: ["추세", "변화", "시간", "월별", "트렌드", "trend", "growth", "증가", "감소"], cats: ["추세"] },
+        { kws: ["관계", "상관", "correlation", "relationship"], cats: ["관계"] },
+        { kws: ["흐름", "프로세스", "단계", "funnel", "유입", "전환", "flow"], cats: ["흐름"] },
+        { kws: ["구조", "계층", "조직", "hierarchy", "tree"], cats: ["구조"] },
+        { kws: ["지역", "지도", "map", "지리", "국가", "region"], cats: ["지리"] },
+        { kws: ["주가", "금융", "캔들", "finance", "stock", "투자"], cats: ["금융"] },
+        { kws: ["텍스트", "워드", "단어", "word", "키워드", "빈도"], cats: ["텍스트"] },
+        { kws: ["설문", "응답", "평가", "점수", "survey", "rating"], cats: ["비교", "분포"] },
+        { kws: ["인구", "연령", "나이", "age", "population", "성별"], cats: ["구성", "비교"] }
+      ];
+
+      const inputEl = document.getElementById("dduktakInput");
+      const countEl = document.getElementById("dduktakCount");
+      const btnEl = document.getElementById("dduktakBtn");
+      const resultsEl = document.getElementById("dduktakResults");
+      const top3El = document.getElementById("dduktakTop3");
+      const etcEl = document.getElementById("dduktakEtc");
+
+      inputEl.addEventListener("input", () => {
+        countEl.textContent = inputEl.value.length;
+      });
+
+      btnEl.addEventListener("click", () => {
+        const text = inputEl.value.trim().toLowerCase();
+        const matchedCats = new Set();
+        KEYWORD_MAP.forEach(({ kws, cats }) => {
+          if (kws.some((k) => text.includes(k.toLowerCase()))) {
+            cats.forEach((c) => matchedCats.add(c));
+          }
+        });
+
+        const scored = CHARTS.map((c) => {
+          let score = 0;
+          if (matchedCats.has(c.category)) score += 2;
+          if (c.difficulty === "초급") score += 1;
+          return { chart: c, score };
+        });
+        scored.sort((a, b) => b.score - a.score);
+
+        const top3 = scored.slice(0, 3);
+        const others = scored.slice(3, 11);
+
+        top3El.innerHTML = top3
+          .map((item, i) => {
+            const c = item.chart;
+            const desc = c.description || "";
+            const descShort = desc.length > 60 ? desc.slice(0, 60) + "…" : desc;
+            return `
+              <a class="dduktak-card" href="chart.html?id=${encodeURIComponent(c.id)}">
+                <span class="dduktak-card-rank">#${i + 1}</span>
+                <div class="dduktak-card-thumb">${getThumbnail(c.id)}</div>
+                <div class="dduktak-card-body">
+                  <div class="dduktak-card-name">${c.name}</div>
+                  <div class="dduktak-card-category">${c.category}</div>
+                  <div class="dduktak-card-desc">${descShort}</div>
+                  <div class="dduktak-card-tags">
+                    ${c.tags.map((t) => `<span class="card-tag">${t}</span>`).join("")}
+                  </div>
+                </div>
+              </a>`;
+          })
+          .join("");
+
+        etcEl.innerHTML = others
+          .map((item) => {
+            const c = item.chart;
+            return `
+              <a class="dduktak-etc-item" href="chart.html?id=${encodeURIComponent(c.id)}">
+                <div class="dduktak-etc-thumb">${getThumbnail(c.id)}</div>
+                <span class="dduktak-etc-name">${c.name}</span>
+                <span class="dduktak-etc-cat">(${c.category})</span>
+              </a>`;
+          })
+          .join("");
+
+        resultsEl.style.display = "block";
+        resultsEl.scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+    })();
+  </script>
+
+  <!-- ADSENSE_BANNER -->
+  <div id="popupAd" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 9999; align-items: center; justify-content: center;">
+    <div style="position: relative; width: 300px; height: 250px; background: #f9fafb; border: 1px solid #e5e7eb; display: flex; align-items: center; justify-content: center; color: #9ca3af; font-size: 12px;">
+      Advertisement
+      <button type="button" id="popupAdClose" aria-label="닫기" style="position: absolute; top: 4px; right: 4px; width: 24px; height: 24px; font-size: 16px; line-height: 1; background: transparent; border: none; cursor: pointer; color: #6b7280;">✕</button>
+    </div>
+  </div>
+  <script>
+    (function () {
+      if (sessionStorage.getItem("popupAdDismissed")) return;
+      var popup = document.getElementById("popupAd");
+      var closeBtn = document.getElementById("popupAdClose");
+      setTimeout(function () { popup.style.display = "flex"; }, 3000);
+      closeBtn.addEventListener("click", function () {
+        popup.style.display = "none";
+        sessionStorage.setItem("popupAdDismissed", "1");
+      });
+    })();
+  </script>
+
+  <!-- ADSENSE_BANNER -->
+  <div id="floatingAd" style="position: fixed; bottom: 20px; right: 20px; width: 160px; height: 600px; background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 4px; z-index: 100; display: flex; align-items: center; justify-content: center; color: #9ca3af; font-size: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.08);">
+    Advertisement
+    <button type="button" id="floatingAdClose" aria-label="닫기" style="position: absolute; top: 4px; right: 4px; width: 24px; height: 24px; font-size: 16px; line-height: 1; background: transparent; border: none; cursor: pointer; color: #6b7280;">✕</button>
+  </div>
+  <script>
+    document.getElementById("floatingAdClose").addEventListener("click", function () {
+      document.getElementById("floatingAd").style.display = "none";
+    });
+  </script>
+</body>
+</html>

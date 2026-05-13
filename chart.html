@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<!-- TODO: 복합 차트 - renderMixedChart 구현 필요 -->
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' cdn.jsdelivr.net; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'none';">
+  <meta http-equiv="X-Frame-Options" content="DENY">
+  <title>Data Gallery</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="site-header">
+    <h1><a href="index.html" class="site-logo">Data Gallery</a></h1>
+  </header>
+
+  <nav class="category-tabs" id="categoryTabs" aria-label="카테고리"></nav>
+
+  <main class="chart-detail" id="chartDetail">
+    <section class="detail-top">
+      <div class="detail-thumb"></div>
+      <div class="detail-info">
+        <h2 class="detail-name" id="chartName"></h2>
+        <div class="card-tags" id="chartTags"></div>
+        <p class="detail-description" id="chartDescription"></p>
+        <h3 class="detail-subtitle">사용 예시</h3>
+        <ul class="detail-examples" id="chartExamples"></ul>
+      </div>
+    </section>
+
+    <section class="detail-builder">
+      <h2 class="builder-title">직접 만들어보세요</h2>
+      <div class="builder-canvas">
+        <canvas id="builderCanvas" style="opacity: 0; transition: opacity 0.5s ease;"></canvas>
+        <div id="builderPlaceholder" style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; color: #999; font-size: 14px; text-align: center; padding: 16px;">
+          아래 데이터를 입력하고 '짠! 🎉' 버튼을 눌러보세요
+        </div>
+      </div>
+
+      <!-- ADSENSE_BANNER -->
+      <div style="width: 300px; height: 250px; max-width: calc(100vw - 16px); margin: 0 auto 20px; background: #f9fafb; border: 1px solid #e5e7eb; display: flex; align-items: center; justify-content: center; color: #9ca3af; font-size: 12px;">Advertisement</div>
+
+      <div class="builder-input-section">
+        <div class="unit-row">
+          <label class="unit-label" for="unitSelect">단위</label>
+          <select id="unitSelect">
+            <option value="">단위 없음</option>
+            <optgroup label="화폐">
+              <option value="원">원(₩)</option>
+              <option value="달러">달러($)</option>
+              <option value="유로">유로(€)</option>
+              <option value="엔">엔(¥)</option>
+            </optgroup>
+            <optgroup label="수량">
+              <option value="개">개</option>
+              <option value="명">명</option>
+              <option value="건">건</option>
+              <option value="회">회</option>
+              <option value="번">번</option>
+            </optgroup>
+            <optgroup label="측정">
+              <option value="km">km</option>
+              <option value="m">m</option>
+              <option value="cm">cm</option>
+              <option value="kg">kg</option>
+              <option value="g">g</option>
+              <option value="L">L</option>
+              <option value="ml">ml</option>
+            </optgroup>
+            <optgroup label="비율">
+              <option value="%">%(퍼센트)</option>
+              <option value="배">배</option>
+              <option value="점">점</option>
+            </optgroup>
+            <optgroup label="시간">
+              <option value="시간">시간</option>
+              <option value="분">분</option>
+              <option value="초">초</option>
+              <option value="일">일</option>
+              <option value="주">주</option>
+              <option value="개월">개월</option>
+              <option value="년">년</option>
+            </optgroup>
+            <optgroup label="기타">
+              <option value="대">대</option>
+              <option value="곳">곳</option>
+              <option value="팀">팀</option>
+              <option value="custom">직접 입력...</option>
+            </optgroup>
+          </select>
+          <input type="text" id="unitCustom" placeholder="단위" style="display: none;">
+        </div>
+
+        <form class="builder-form" id="builderForm">
+          <div class="builder-col">
+            <span class="builder-col-title">데이터 1</span>
+            <label>데이터 명칭<input type="text" data-field="label" data-index="0"></label>
+            <label>숫자 데이터<input type="number" data-field="value" data-index="0"></label>
+            <label>색상<input type="color" data-field="color" data-index="0" value="#2563EB" style="height: 36px; padding: 2px; cursor: pointer;"></label>
+          </div>
+          <div class="builder-col">
+            <span class="builder-col-title">데이터 2</span>
+            <label>데이터 명칭<input type="text" data-field="label" data-index="1"></label>
+            <label>숫자 데이터<input type="number" data-field="value" data-index="1"></label>
+            <label>색상<input type="color" data-field="color" data-index="1" value="#60A5FA" style="height: 36px; padding: 2px; cursor: pointer;"></label>
+          </div>
+          <div class="builder-col">
+            <span class="builder-col-title">데이터 3</span>
+            <label>데이터 명칭<input type="text" data-field="label" data-index="2"></label>
+            <label>숫자 데이터<input type="number" data-field="value" data-index="2"></label>
+            <label>색상<input type="color" data-field="color" data-index="2" value="#93C5FD" style="height: 36px; padding: 2px; cursor: pointer;"></label>
+          </div>
+          <div class="builder-col">
+            <span class="builder-col-title">데이터 4</span>
+            <label>데이터 명칭<input type="text" data-field="label" data-index="3"></label>
+            <label>숫자 데이터<input type="number" data-field="value" data-index="3"></label>
+            <label>색상<input type="color" data-field="color" data-index="3" value="#F59E0B" style="height: 36px; padding: 2px; cursor: pointer;"></label>
+          </div>
+          <div class="builder-col">
+            <span class="builder-col-title">데이터 5</span>
+            <label>데이터 명칭<input type="text" data-field="label" data-index="4"></label>
+            <label>숫자 데이터<input type="number" data-field="value" data-index="4"></label>
+            <label>색상<input type="color" data-field="color" data-index="4" value="#10B981" style="height: 36px; padding: 2px; cursor: pointer;"></label>
+          </div>
+        </form>
+
+        <div id="formButtons" style="display: flex; gap: 12px; justify-content: center; margin-top: 20px; flex-wrap: wrap;">
+          <button type="button" id="loadSampleBtn" style="padding: 10px 20px; font-size: 14px; font-family: inherit; background: #fff; color: #2563EB; border: 1.5px solid #2563EB; border-radius: 8px; cursor: pointer;">예시 데이터 불러오기</button>
+          <button type="button" id="renderBtn" style="padding: 14px 32px; font-size: 18px; font-weight: 700; font-family: inherit; background: #2563EB; color: #fff; border: none; border-radius: 8px; cursor: pointer; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);">짠! 🎉</button>
+        </div>
+
+        <div id="mixedModeRow" style="display: flex; justify-content: center; align-items: center; margin-top: 16px;">
+          <label style="display: inline-flex; align-items: center; gap: 10px; cursor: pointer; user-select: none; font-size: 14px; color: #444;">
+            <input type="checkbox" id="mixedModeToggle" style="width: 18px; height: 18px; cursor: pointer; accent-color: #2563EB;">
+            <span>복합 차트 모드</span>
+          </label>
+        </div>
+
+        <div id="mixedSettings" style="display: none; flex-direction: column; gap: 16px; margin-top: 24px; padding: 20px; background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 10px;">
+          <h3 style="font-size: 16px; font-weight: 700; color: #1f2937; margin: 0;">복합 차트 설정</h3>
+
+          <label style="display: flex; flex-direction: column; gap: 6px; font-size: 13px; color: #4b5563;">
+            어떤 차트를 섞을까요?
+            <select id="mixChartSelect" style="padding: 10px 12px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px; font-family: inherit; background: #fff;">
+              <option value="">선택해주세요</option>
+            </select>
+          </label>
+
+          <div id="mixIncompatibleNotice" style="display: none; padding: 12px; background: #fef3c7; border: 1px solid #fcd34d; border-radius: 6px; color: #92400e; font-size: 13px;">
+            이 차트는 단독 사용만 가능합니다.
+          </div>
+
+          <div class="unit-row">
+            <label class="unit-label" for="mixUnitSelect">추가 단위</label>
+            <select id="mixUnitSelect">
+              <option value="">단위 없음</option>
+              <optgroup label="화폐">
+                <option value="원">원(₩)</option>
+                <option value="달러">달러($)</option>
+                <option value="유로">유로(€)</option>
+                <option value="엔">엔(¥)</option>
+              </optgroup>
+              <optgroup label="수량">
+                <option value="개">개</option>
+                <option value="명">명</option>
+                <option value="건">건</option>
+                <option value="회">회</option>
+                <option value="번">번</option>
+              </optgroup>
+              <optgroup label="측정">
+                <option value="km">km</option>
+                <option value="m">m</option>
+                <option value="cm">cm</option>
+                <option value="kg">kg</option>
+                <option value="g">g</option>
+                <option value="L">L</option>
+                <option value="ml">ml</option>
+              </optgroup>
+              <optgroup label="비율">
+                <option value="%">%(퍼센트)</option>
+                <option value="배">배</option>
+                <option value="점">점</option>
+              </optgroup>
+              <optgroup label="시간">
+                <option value="시간">시간</option>
+                <option value="분">분</option>
+                <option value="초">초</option>
+                <option value="일">일</option>
+                <option value="주">주</option>
+                <option value="개월">개월</option>
+                <option value="년">년</option>
+              </optgroup>
+              <optgroup label="기타">
+                <option value="대">대</option>
+                <option value="곳">곳</option>
+                <option value="팀">팀</option>
+                <option value="custom">직접 입력...</option>
+              </optgroup>
+            </select>
+            <input type="text" id="mixUnitCustom" placeholder="단위" style="display: none;">
+          </div>
+
+          <form id="mixForm" class="builder-form" style="display: none;">
+            <div class="builder-col">
+              <span class="builder-col-title">추가 데이터 1</span>
+              <label>데이터 명칭<input type="text" data-mixfield="label" data-mixindex="0"></label>
+              <label>숫자 데이터<input type="number" data-mixfield="value" data-mixindex="0"></label>
+              <label>색상<input type="color" data-mixfield="color" data-mixindex="0" value="#DC2626" style="height: 36px; padding: 2px; cursor: pointer;"></label>
+            </div>
+            <div class="builder-col">
+              <span class="builder-col-title">추가 데이터 2</span>
+              <label>데이터 명칭<input type="text" data-mixfield="label" data-mixindex="1"></label>
+              <label>숫자 데이터<input type="number" data-mixfield="value" data-mixindex="1"></label>
+              <label>색상<input type="color" data-mixfield="color" data-mixindex="1" value="#EF4444" style="height: 36px; padding: 2px; cursor: pointer;"></label>
+            </div>
+            <div class="builder-col">
+              <span class="builder-col-title">추가 데이터 3</span>
+              <label>데이터 명칭<input type="text" data-mixfield="label" data-mixindex="2"></label>
+              <label>숫자 데이터<input type="number" data-mixfield="value" data-mixindex="2"></label>
+              <label>색상<input type="color" data-mixfield="color" data-mixindex="2" value="#F87171" style="height: 36px; padding: 2px; cursor: pointer;"></label>
+            </div>
+            <div class="builder-col">
+              <span class="builder-col-title">추가 데이터 4</span>
+              <label>데이터 명칭<input type="text" data-mixfield="label" data-mixindex="3"></label>
+              <label>숫자 데이터<input type="number" data-mixfield="value" data-mixindex="3"></label>
+              <label>색상<input type="color" data-mixfield="color" data-mixindex="3" value="#FCA5A5" style="height: 36px; padding: 2px; cursor: pointer;"></label>
+            </div>
+            <div class="builder-col">
+              <span class="builder-col-title">추가 데이터 5</span>
+              <label>데이터 명칭<input type="text" data-mixfield="label" data-mixindex="4"></label>
+              <label>숫자 데이터<input type="number" data-mixfield="value" data-mixindex="4"></label>
+              <label>색상<input type="color" data-mixfield="color" data-mixindex="4" value="#FECACA" style="height: 36px; padding: 2px; cursor: pointer;"></label>
+            </div>
+          </form>
+
+          <div id="mixButtonRow" style="display: none; justify-content: center;">
+            <button type="button" id="mixRenderBtn" style="padding: 14px 32px; font-size: 18px; font-weight: 700; font-family: inherit; background: #DC2626; color: #fff; border: none; border-radius: 8px; cursor: pointer; box-shadow: 0 4px 12px rgba(220, 38, 38, 0.25);">짠! 🎉 (복합)</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="chartButtons" style="display: none; gap: 12px; justify-content: center; margin-top: 20px; flex-wrap: wrap;">
+        <button type="button" id="resetBtn" style="padding: 10px 20px; font-size: 14px; font-family: inherit; background: #fff; color: #2563EB; border: 1.5px solid #2563EB; border-radius: 8px; cursor: pointer;">다시 입력하기</button>
+        <button type="button" id="downloadBtn" style="padding: 10px 20px; font-size: 14px; font-family: inherit; background: #fff; color: #2563EB; border: 1.5px solid #2563EB; border-radius: 8px; cursor: pointer;">이미지로 저장</button>
+      </div>
+    </section>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.6/dist/chart.umd.js"
+    integrity="sha384-MH1axGwz/uQzfIcjFdjEfsM0xlf5mmWfAwwggaOh5IPFvgKFGbJ2PZ4VBbgSYBQN"
+    crossorigin="anonymous"></script>
+  <script src="data/charts.js"></script>
+  <script src="js/thumbnails.js"></script>
+  <script src="js/chart.js"></script>
+  <script>
+    (function () {
+      const id = new URLSearchParams(location.search).get("id");
+      const thumb = document.querySelector(".detail-thumb");
+      if (id && thumb) thumb.innerHTML = getThumbnail(id);
+    })();
+  </script>
+
+  <!-- ADSENSE_BANNER -->
+  <div id="entryAd" style="position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 728px; max-width: calc(100vw - 16px); height: 90px; background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 4px 4px 0 0; z-index: 200; display: flex; align-items: center; justify-content: center; color: #9ca3af; font-size: 12px;">
+    Advertisement
+    <button type="button" id="entryAdClose" aria-label="닫기" style="position: absolute; top: 4px; right: 4px; width: 24px; height: 24px; font-size: 16px; line-height: 1; background: transparent; border: none; cursor: pointer; color: #6b7280;">✕</button>
+  </div>
+  <script>
+    (function () {
+      var ad = document.getElementById("entryAd");
+      var btn = document.getElementById("entryAdClose");
+      var timer = setTimeout(function () { ad.style.display = "none"; }, 5000);
+      btn.addEventListener("click", function () {
+        clearTimeout(timer);
+        ad.style.display = "none";
+      });
+    })();
+  </script>
+
+  <!-- ADSENSE_BANNER -->
+  <div id="floatingAd" style="position: fixed; bottom: 20px; right: 20px; width: 160px; height: 600px; background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 4px; z-index: 100; display: flex; align-items: center; justify-content: center; color: #9ca3af; font-size: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.08);">
+    Advertisement
+    <button type="button" id="floatingAdClose" aria-label="닫기" style="position: absolute; top: 4px; right: 4px; width: 24px; height: 24px; font-size: 16px; line-height: 1; background: transparent; border: none; cursor: pointer; color: #6b7280;">✕</button>
+  </div>
+  <script>
+    document.getElementById("floatingAdClose").addEventListener("click", function () {
+      document.getElementById("floatingAd").style.display = "none";
+    });
+  </script>
+</body>
+</html>
