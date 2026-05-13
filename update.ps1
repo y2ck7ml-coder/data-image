@@ -1,9 +1,12 @@
-# GitHub 푸시 + (옵션) Vercel 배포 통합 스크립트
+# GitHub push + (optional) Vercel deploy workflow script
 #
-# 사용법:
-#   .\update.ps1 "커밋 메시지"                  -> GitHub 푸시만
-#   .\update.ps1 "커밋 메시지" -Deploy          -> 푸시 + Vercel 프리뷰
-#   .\update.ps1 "커밋 메시지" -Deploy -Prod    -> 푸시 + Vercel 프로덕션
+# Usage:
+#   .\update.ps1 "commit message"                  -> git push only
+#   .\update.ps1 "commit message" -Deploy          -> push + Vercel preview
+#   .\update.ps1 "commit message" -Deploy -Prod    -> push + Vercel production
+#
+# Korean Windows users: run via update.bat wrapper to avoid ExecutionPolicy
+# and encoding issues.
 
 param(
     [Parameter(Mandatory=$true, Position=0)]
@@ -15,44 +18,44 @@ param(
 
 Set-Location $PSScriptRoot
 
-# 1. Git: 변경사항 있을 때만 커밋 & 푸시
+# 1. Git: commit & push only if there are changes
 $status = git status --porcelain
 if ($LASTEXITCODE -ne 0) {
-    Write-Host "[ERROR] git status 실패 - 저장소가 아닌 디렉토리일 수 있음" -ForegroundColor Red
+    Write-Host "[ERROR] git status failed - not a git repository?" -ForegroundColor Red
     exit 1
 }
 
 if ($status) {
     git add .
-    if ($LASTEXITCODE -ne 0) { Write-Host "[ERROR] git add 실패" -ForegroundColor Red; exit 1 }
+    if ($LASTEXITCODE -ne 0) { Write-Host "[ERROR] git add failed" -ForegroundColor Red; exit 1 }
 
     git commit -m $Message
-    if ($LASTEXITCODE -ne 0) { Write-Host "[ERROR] git commit 실패" -ForegroundColor Red; exit 1 }
+    if ($LASTEXITCODE -ne 0) { Write-Host "[ERROR] git commit failed" -ForegroundColor Red; exit 1 }
 
     git push origin main
-    if ($LASTEXITCODE -ne 0) { Write-Host "[ERROR] git push 실패" -ForegroundColor Red; exit 1 }
+    if ($LASTEXITCODE -ne 0) { Write-Host "[ERROR] git push failed" -ForegroundColor Red; exit 1 }
 
-    Write-Host "[OK] GitHub 푸시 완료" -ForegroundColor Green
+    Write-Host "[OK] GitHub push complete" -ForegroundColor Green
 } else {
-    Write-Host "[SKIP] 변경사항 없음 (커밋/푸시 건너뜀)" -ForegroundColor Yellow
+    Write-Host "[SKIP] No changes (commit/push skipped)" -ForegroundColor Yellow
 }
 
-# 2. Vercel 배포 (옵션)
+# 2. Vercel deploy (optional)
 if ($Deploy) {
     $env:Path = "$env:APPDATA\npm;$env:Path"
 
     if ($Prod) {
-        Write-Host "[..] Vercel 프로덕션 배포 중..." -ForegroundColor Cyan
+        Write-Host "[..] Vercel production deploy..." -ForegroundColor Cyan
         vercel.cmd deploy --prod --cwd $PSScriptRoot --yes
     } else {
-        Write-Host "[..] Vercel 프리뷰 배포 중..." -ForegroundColor Cyan
+        Write-Host "[..] Vercel preview deploy..." -ForegroundColor Cyan
         vercel.cmd deploy --cwd $PSScriptRoot --yes
     }
 
     if ($LASTEXITCODE -ne 0) {
-        Write-Host "[ERROR] Vercel 배포 실패" -ForegroundColor Red
+        Write-Host "[ERROR] Vercel deploy failed" -ForegroundColor Red
         exit 1
     }
 
-    Write-Host "[OK] Vercel 배포 완료" -ForegroundColor Green
+    Write-Host "[OK] Vercel deploy complete" -ForegroundColor Green
 }
