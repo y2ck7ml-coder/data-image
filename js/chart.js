@@ -64,6 +64,7 @@ function renderDetail() {
 // 2. 빌더 초기화 / 폼 유틸
 // ===========================================
 function initBuilder() {
+  applyInputTypeUI();
   document.getElementById("loadSampleBtn").addEventListener("click", loadSample);
   document.getElementById("renderBtn").addEventListener("click", renderChart);
   document.getElementById("resetBtn").addEventListener("click", resetToForm);
@@ -99,14 +100,80 @@ function getUnit(isMix = false) {
 }
 
 function loadSample() {
-  const sampleLabels = chart.sampleData?.labels || [];
-  const sampleValues = chart.sampleData?.datasets?.[0]?.data || [];
+  // exampleData(차트별 맞춤 예시)가 있으면 우선 사용, 없으면 기존 sampleData
+  const labels =
+    chart.exampleData?.labels ||
+    chart.sampleData?.labels ||
+    [];
+  const values =
+    chart.exampleData?.values ||
+    chart.sampleData?.datasets?.[0]?.data ||
+    [];
   document.querySelectorAll('[data-field="label"]').forEach((el, i) => {
-    el.value = sampleLabels[i] ?? "";
+    el.value = labels[i] ?? "";
   });
   document.querySelectorAll('[data-field="value"]').forEach((el, i) => {
-    el.value = sampleValues[i] ?? "";
+    el.value = values[i] ?? "";
   });
+}
+
+// inputType별 입력 UI 메타데이터: 컬럼 헤더 + 하단 힌트 문구
+const INPUT_TYPE_UI = {
+  numeric: {
+    labelHdr: "데이터 명칭",
+    valueHdr: "숫자 데이터",
+    hint: "항목명과 수치를 입력하세요. (예: 1월 / 320)"
+  },
+  ratio: {
+    labelHdr: "항목 명칭",
+    valueHdr: "비율 / 수량",
+    hint: "전체에서 차지하는 비율이나 수량을 입력하세요."
+  },
+  timeseries: {
+    labelHdr: "날짜 / 기간",
+    valueHdr: "수치",
+    hint: "시간 순서대로 날짜·기간과 그에 해당하는 수치를 입력하세요."
+  },
+  relational: {
+    labelHdr: "노드 명칭",
+    valueHdr: "비중 (선택)",
+    hint: "중심 주제에 연결되는 항목을 입력하세요. 비중은 노드 크기에 사용됩니다."
+  },
+  flow: {
+    labelHdr: "단계 / 노드",
+    valueHdr: "수치 (선택)",
+    hint: "흐름의 순서대로 단계명을 입력하세요. 수치는 단계의 크기/값입니다."
+  },
+  distribution: {
+    labelHdr: "구간 / 그룹",
+    valueHdr: "빈도 / 수치",
+    hint: "구간이나 그룹별 빈도/측정값을 입력하세요."
+  },
+  multiaxis: {
+    labelHdr: "항목 명칭",
+    valueHdr: "주요 수치",
+    hint: "비교할 항목과 대표 수치를 5개 정도 입력하세요."
+  }
+};
+
+function applyInputTypeUI() {
+  const type = chart.inputType || "numeric";
+  const ui = INPUT_TYPE_UI[type] || INPUT_TYPE_UI.numeric;
+
+  // 메인 폼 + 복합 폼의 label/value 컬럼 헤더를 동적으로 교체
+  const updateHeader = (selector, text) => {
+    document.querySelectorAll(selector).forEach((input) => {
+      const node = input.parentElement?.childNodes?.[0];
+      if (node && node.nodeType === Node.TEXT_NODE) node.nodeValue = text;
+    });
+  };
+  updateHeader('label > input[data-field="label"]', ui.labelHdr);
+  updateHeader('label > input[data-field="value"]', ui.valueHdr);
+  updateHeader('label > input[data-mixfield="label"]', ui.labelHdr);
+  updateHeader('label > input[data-mixfield="value"]', ui.valueHdr);
+
+  const hintEl = document.getElementById("inputTypeHint");
+  if (hintEl) hintEl.textContent = ui.hint;
 }
 
 function readForm() {
@@ -199,7 +266,39 @@ const CHART_RENDER_MAP = {
   "combo-chart":      { engine: "svg", type: "combo" },
   "dashboard-card":   { engine: "svg", type: "dashcard" },
   gauge:              { engine: "svg", type: "gauge" },
-  "bullet-bar":       { engine: "svg", type: "bulletbar" }
+  "bullet-bar":       { engine: "svg", type: "bulletbar" },
+
+  // ----- 통계 (신규) -----
+  "qq-plot":              { engine: "chartjs", type: "scatter" },
+  "error-bar":            { engine: "chartjs", type: "bar" },
+  "pdf-curve":            { engine: "chartjs", type: "line", fill: true },
+  "cdf-curve":            { engine: "chartjs", type: "line" },
+  "correlation-heatmap":  { engine: "svg", type: "heatmap" },
+  "residual-plot":        { engine: "chartjs", type: "scatter" },
+  "kaplan-meier":         { engine: "chartjs", type: "line" },
+
+  // ----- 금융 (신규) -----
+  "bollinger-bands":      { engine: "chartjs", type: "line" },
+  "volume-bar":           { engine: "chartjs", type: "bar" },
+  "moving-average":       { engine: "chartjs", type: "line" },
+  "return-distribution":  { engine: "chartjs", type: "bar" },
+  "correlation-matrix":   { engine: "svg", type: "heatmap" },
+
+  // ----- 경제 (신규) -----
+  "lorenz-curve":         { engine: "chartjs", type: "line", fill: true },
+  "supply-demand":        { engine: "chartjs", type: "line" },
+  "phillips-curve":       { engine: "chartjs", type: "line" },
+  "ppf-curve":            { engine: "chartjs", type: "line" },
+  "business-cycle":       { engine: "chartjs", type: "line" },
+  "gini-index":           { engine: "chartjs", type: "bar" },
+
+  // ----- 사회 (신규) -----
+  "population-pyramid":      { engine: "chartjs", type: "bar", indexAxis: "y" },
+  "cohort-chart":            { engine: "chartjs", type: "bar" },
+  "likert-scale":            { engine: "chartjs", type: "bar" },
+  "social-network":          { engine: "svg", type: "network" },
+  "age-gender-distribution": { engine: "chartjs", type: "bar" },
+  "survey-stacked":          { engine: "chartjs", type: "bar" }
 };
 
 function renderChart() {

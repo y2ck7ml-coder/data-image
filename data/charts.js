@@ -1,5 +1,14 @@
-// 차트 샘플 데이터 (57개 / 12개 카테고리)
+// 차트 샘플 데이터 (81개 / 16개 카테고리)
 // compatibleWith: 복합 차트 모드에서 함께 섞을 수 있는 Chart.js 렌더 타입 목록
+// inputType: 사용자 입력 UI 유형
+//   - numeric      : 항목명 + 수치 (막대/선/원 등)
+//   - ratio        : 항목명 + 비율/수량 (파이/도넛/트리맵)
+//   - timeseries   : 날짜/기간 + 수치 (라인/주가/캔들)
+//   - relational   : 노드 명칭 + 비중(선택) (마인드맵/조직도/네트워크)
+//   - flow         : 단계명 + 수치(선택) (퍼널/플로우/타임라인)
+//   - distribution : 구간/그룹 + 빈도/수치 (히스토그램/박스/바이올린)
+//   - multiaxis    : 항목명 + 복수 축 수치 (레이더/버블/간트)
+// exampleData: 차트별 맞춤 예시 데이터 ({ labels, values })
 const CHARTS = [
   // ===== 비교 (6) =====
   {
@@ -13,9 +22,14 @@ const CHARTS = [
     tools: ["엑셀", "구글시트", "파이썬"],
     chartType: "bar",
     compatibleWith: ["line", "scatter", "bubble"],
+    inputType: "numeric",
     sampleData: {
       labels: ["1월", "2월", "3월"],
       datasets: [{ label: "매출", data: [120, 190, 150] }]
+    },
+    exampleData: {
+      labels: ["1월", "2월", "3월", "4월", "5월"],
+      values: [320, 450, 380, 520, 610]
     }
   },
   {
@@ -29,9 +43,14 @@ const CHARTS = [
     tools: ["엑셀", "구글시트", "Tableau"],
     chartType: "horizontalBar",
     compatibleWith: [],
+    inputType: "numeric",
     sampleData: {
       labels: ["서울", "부산", "인천"],
       datasets: [{ label: "인구", data: [950, 340, 290] }]
+    },
+    exampleData: {
+      labels: ["서울", "부산", "인천", "대구", "광주"],
+      values: [958, 341, 294, 243, 148]
     }
   },
   {
@@ -45,9 +64,14 @@ const CHARTS = [
     tools: ["파이썬", "R", "Tableau"],
     chartType: "bar",
     compatibleWith: ["line", "bubble"],
+    inputType: "numeric",
     sampleData: {
       labels: ["A팀", "B팀", "C팀"],
       datasets: [{ label: "점수", data: [78, 92, 85] }]
+    },
+    exampleData: {
+      labels: ["A팀", "B팀", "C팀", "D팀", "E팀"],
+      values: [78, 92, 85, 68, 74]
     }
   },
   {
@@ -61,9 +85,14 @@ const CHARTS = [
     tools: ["Tableau", "PowerBI", "D3.js"],
     chartType: "bar",
     compatibleWith: [],
+    inputType: "numeric",
     sampleData: {
       labels: ["목표", "실적", "예측"],
       datasets: [{ label: "달성률(%)", data: [100, 87, 95] }]
+    },
+    exampleData: {
+      labels: ["실적", "목표", "예측", "평균", "최대"],
+      values: [87, 100, 95, 82, 120]
     }
   },
   {
@@ -77,9 +106,14 @@ const CHARTS = [
     tools: ["엑셀", "Chart.js", "D3.js"],
     chartType: "bar",
     compatibleWith: [],
+    inputType: "multiaxis",
     sampleData: {
       labels: ["기획", "개발", "디자인"],
       datasets: [{ label: "역량", data: [80, 90, 70] }]
+    },
+    exampleData: {
+      labels: ["기획", "개발", "디자인", "마케팅", "운영"],
+      values: [80, 90, 70, 75, 85]
     }
   },
   {
@@ -93,9 +127,14 @@ const CHARTS = [
     tools: ["엑셀", "PowerPoint", "Tableau"],
     chartType: "bar",
     compatibleWith: [],
+    inputType: "distribution",
     sampleData: {
       labels: ["임원", "관리자", "실무자"],
       datasets: [{ label: "인원", data: [5, 20, 75] }]
+    },
+    exampleData: {
+      labels: ["임원", "팀장", "팀원", "인턴", "협력사"],
+      values: [5, 15, 60, 12, 8]
     }
   },
 
@@ -111,9 +150,14 @@ const CHARTS = [
     tools: ["엑셀", "구글시트", "Chart.js"],
     chartType: "pie",
     compatibleWith: [],
+    inputType: "ratio",
     sampleData: {
       labels: ["A", "B", "C"],
       datasets: [{ label: "비율", data: [50, 30, 20] }]
+    },
+    exampleData: {
+      labels: ["A 브랜드", "B 브랜드", "C 브랜드", "D 브랜드", "기타"],
+      values: [42, 28, 16, 9, 5]
     }
   },
   {
@@ -127,9 +171,14 @@ const CHARTS = [
     tools: ["엑셀", "Chart.js", "D3.js"],
     chartType: "doughnut",
     compatibleWith: [],
+    inputType: "ratio",
     sampleData: {
       labels: ["모바일", "데스크탑", "태블릿"],
       datasets: [{ label: "트래픽", data: [60, 30, 10] }]
+    },
+    exampleData: {
+      labels: ["모바일", "데스크탑", "태블릿", "TV", "기타"],
+      values: [62, 26, 8, 3, 1]
     }
   },
   {
@@ -143,9 +192,14 @@ const CHARTS = [
     tools: ["엑셀", "Tableau", "파이썬"],
     chartType: "bar",
     compatibleWith: ["line", "scatter", "bubble"],
+    inputType: "ratio",
     sampleData: {
       labels: ["Q1", "Q2", "Q3"],
       datasets: [{ label: "온라인", data: [40, 55, 65] }]
+    },
+    exampleData: {
+      labels: ["Q1", "Q2", "Q3", "Q4", "연간"],
+      values: [320, 410, 480, 560, 1770]
     }
   },
   {
@@ -159,9 +213,14 @@ const CHARTS = [
     tools: ["Tableau", "파이썬", "D3.js"],
     chartType: "bar",
     compatibleWith: ["bar", "scatter"],
+    inputType: "timeseries",
     sampleData: {
       labels: ["2023", "2024", "2025"],
       datasets: [{ label: "유료 사용자", data: [200, 350, 480] }]
+    },
+    exampleData: {
+      labels: ["2021", "2022", "2023", "2024", "2025"],
+      values: [200, 310, 450, 620, 810]
     }
   },
   {
@@ -175,9 +234,14 @@ const CHARTS = [
     tools: ["엑셀", "PowerBI", "Tableau"],
     chartType: "bar",
     compatibleWith: [],
+    inputType: "flow",
     sampleData: {
       labels: ["시작", "수익", "비용"],
       datasets: [{ label: "변동", data: [100, 80, -40] }]
+    },
+    exampleData: {
+      labels: ["시작 잔액", "신규 매출", "환불", "비용", "최종"],
+      values: [1000, 450, -80, -220, 1150]
     }
   },
   {
@@ -191,9 +255,14 @@ const CHARTS = [
     tools: ["Tableau", "PowerBI", "D3.js"],
     chartType: "bar",
     compatibleWith: [],
+    inputType: "ratio",
     sampleData: {
       labels: ["산업A", "산업B", "산업C"],
       datasets: [{ label: "비중", data: [45, 30, 25] }]
+    },
+    exampleData: {
+      labels: ["식품", "가전", "의류", "뷰티", "기타"],
+      values: [45, 26, 14, 9, 6]
     }
   },
 
@@ -209,9 +278,14 @@ const CHARTS = [
     tools: ["파이썬", "R", "엑셀"],
     chartType: "bar",
     compatibleWith: ["line", "scatter", "bubble"],
+    inputType: "distribution",
     sampleData: {
       labels: ["0~30", "30~60", "60~90"],
       datasets: [{ label: "빈도", data: [12, 45, 28] }]
+    },
+    exampleData: {
+      labels: ["0~20점", "20~40점", "40~60점", "60~80점", "80~100점"],
+      values: [4, 18, 32, 21, 8]
     }
   },
   {
@@ -225,9 +299,14 @@ const CHARTS = [
     tools: ["파이썬", "R", "Tableau"],
     chartType: "bar",
     compatibleWith: [],
+    inputType: "distribution",
     sampleData: {
       labels: ["A그룹", "B그룹", "C그룹"],
       datasets: [{ label: "중앙값", data: [55, 62, 70] }]
+    },
+    exampleData: {
+      labels: ["A 그룹", "B 그룹", "C 그룹", "D 그룹", "E 그룹"],
+      values: [55, 62, 70, 48, 81]
     }
   },
   {
@@ -241,9 +320,14 @@ const CHARTS = [
     tools: ["파이썬", "R", "엑셀"],
     chartType: "bar",
     compatibleWith: ["line", "bubble"],
+    inputType: "distribution",
     sampleData: {
       labels: ["샘플1", "샘플2", "샘플3"],
       datasets: [{ label: "값", data: [25, 60, 88] }]
+    },
+    exampleData: {
+      labels: ["관측1", "관측2", "관측3", "관측4", "관측5"],
+      values: [25, 60, 88, 42, 71]
     }
   },
   {
@@ -257,9 +341,14 @@ const CHARTS = [
     tools: ["파이썬", "Tableau", "D3.js"],
     chartType: "bar",
     compatibleWith: ["bar", "scatter"],
+    inputType: "multiaxis",
     sampleData: {
       labels: ["제품A", "제품B", "제품C"],
       datasets: [{ label: "매출", data: [150, 300, 220] }]
+    },
+    exampleData: {
+      labels: ["제품A", "제품B", "제품C", "제품D", "제품E"],
+      values: [150, 300, 220, 180, 260]
     }
   },
   {
@@ -273,9 +362,14 @@ const CHARTS = [
     tools: ["파이썬", "R", "Seaborn"],
     chartType: "bar",
     compatibleWith: [],
+    inputType: "distribution",
     sampleData: {
       labels: ["대조군", "실험A", "실험B"],
       datasets: [{ label: "평균", data: [50, 65, 72] }]
+    },
+    exampleData: {
+      labels: ["대조군", "실험 A", "실험 B", "실험 C", "실험 D"],
+      values: [50, 65, 72, 68, 75]
     }
   },
 
@@ -291,9 +385,14 @@ const CHARTS = [
     tools: ["엑셀", "Chart.js", "파이썬"],
     chartType: "line",
     compatibleWith: ["bar", "scatter"],
+    inputType: "timeseries",
     sampleData: {
       labels: ["1월", "2월", "3월"],
       datasets: [{ label: "방문자", data: [320, 450, 510] }]
+    },
+    exampleData: {
+      labels: ["1월", "2월", "3월", "4월", "5월"],
+      values: [320, 450, 510, 580, 650]
     }
   },
   {
@@ -307,9 +406,14 @@ const CHARTS = [
     tools: ["엑셀", "Tableau", "파이썬"],
     chartType: "bar",
     compatibleWith: ["bar", "scatter"],
+    inputType: "timeseries",
     sampleData: {
       labels: ["1월", "2월", "3월"],
       datasets: [{ label: "매출", data: [120, 180, 240] }]
+    },
+    exampleData: {
+      labels: ["1월", "2월", "3월", "4월", "5월"],
+      values: [120, 180, 240, 310, 380]
     }
   },
   {
@@ -323,9 +427,14 @@ const CHARTS = [
     tools: ["파이썬", "R", "PowerBI"],
     chartType: "bar",
     compatibleWith: ["bar", "scatter"],
+    inputType: "timeseries",
     sampleData: {
       labels: ["과거", "현재", "예측"],
       datasets: [{ label: "값", data: [200, 280, 340] }]
+    },
+    exampleData: {
+      labels: ["1월", "2월", "3월", "4월(예측)", "5월(예측)"],
+      values: [200, 280, 340, 420, 510]
     }
   },
   {
@@ -339,9 +448,14 @@ const CHARTS = [
     tools: ["엑셀", "Chart.js", "Tableau"],
     chartType: "bar",
     compatibleWith: ["bar", "scatter"],
+    inputType: "timeseries",
     sampleData: {
       labels: ["Q1", "Q2", "Q3"],
       datasets: [{ label: "누적", data: [100, 240, 410] }]
+    },
+    exampleData: {
+      labels: ["Q1", "Q2", "Q3", "Q4", "Q5"],
+      values: [100, 240, 410, 620, 880]
     }
   },
   {
@@ -355,9 +469,14 @@ const CHARTS = [
     tools: ["엑셀", "Tableau", "D3.js"],
     chartType: "bar",
     compatibleWith: ["bar", "scatter"],
+    inputType: "timeseries",
     sampleData: {
       labels: ["W1", "W2", "W3"],
       datasets: [{ label: "추세", data: [40, 55, 70] }]
+    },
+    exampleData: {
+      labels: ["W1", "W2", "W3", "W4", "W5"],
+      values: [40, 55, 48, 62, 70]
     }
   },
 
@@ -373,9 +492,14 @@ const CHARTS = [
     tools: ["Tableau", "D3.js", "파이썬"],
     chartType: "bar",
     compatibleWith: ["bar", "scatter"],
+    inputType: "multiaxis",
     sampleData: {
       labels: ["A×1", "A×2", "B×1"],
       datasets: [{ label: "교차값", data: [40, 60, 25] }]
+    },
+    exampleData: {
+      labels: ["A×서울", "A×부산", "B×서울", "B×부산", "C×서울"],
+      values: [40, 60, 25, 45, 30]
     }
   },
   {
@@ -389,9 +513,14 @@ const CHARTS = [
     tools: ["파이썬", "R", "Tableau"],
     chartType: "bar",
     compatibleWith: [],
+    inputType: "distribution",
     sampleData: {
       labels: ["월", "화", "수"],
       datasets: [{ label: "방문", data: [80, 110, 95] }]
+    },
+    exampleData: {
+      labels: ["월요일", "화요일", "수요일", "목요일", "금요일"],
+      values: [80, 110, 95, 120, 140]
     }
   },
   {
@@ -405,9 +534,14 @@ const CHARTS = [
     tools: ["파이썬", "R", "Seaborn"],
     chartType: "bar",
     compatibleWith: ["line", "bubble"],
+    inputType: "multiaxis",
     sampleData: {
       labels: ["X-Y", "X-Z", "Y-Z"],
       datasets: [{ label: "상관", data: [70, 45, 60] }]
+    },
+    exampleData: {
+      labels: ["가격-매출", "가격-리뷰", "매출-리뷰", "가격-반품", "매출-반품"],
+      values: [70, 45, 60, -30, -20]
     }
   },
   {
@@ -421,9 +555,14 @@ const CHARTS = [
     tools: ["파이썬", "R", "엑셀"],
     chartType: "bar",
     compatibleWith: ["line", "bubble"],
+    inputType: "multiaxis",
     sampleData: {
       labels: ["A-B", "A-C", "B-C"],
       datasets: [{ label: "상관계수×100", data: [85, 30, 55] }]
+    },
+    exampleData: {
+      labels: ["광고-매출", "광고-방문", "매출-방문", "광고-회원", "매출-회원"],
+      values: [85, 55, 72, 40, 65]
     }
   },
   {
@@ -437,9 +576,14 @@ const CHARTS = [
     tools: ["D3.js", "파이썬", "R"],
     chartType: "bar",
     compatibleWith: [],
+    inputType: "relational",
     sampleData: {
       labels: ["A→B", "B→C", "C→A"],
       datasets: [{ label: "흐름", data: [120, 90, 60] }]
+    },
+    exampleData: {
+      labels: ["한국→일본", "일본→중국", "중국→한국", "한국→미국", "미국→일본"],
+      values: [120, 90, 60, 80, 110]
     }
   },
 
@@ -455,9 +599,14 @@ const CHARTS = [
     tools: ["엑셀", "PowerBI", "Tableau"],
     chartType: "bar",
     compatibleWith: [],
+    inputType: "flow",
     sampleData: {
       labels: ["매출", "비용", "이익"],
       datasets: [{ label: "금액", data: [500, 300, 200] }]
+    },
+    exampleData: {
+      labels: ["매출", "원가", "판관비", "영업이익", "순이익"],
+      values: [1000, -600, -200, 200, 150]
     }
   },
   {
@@ -471,9 +620,14 @@ const CHARTS = [
     tools: ["GA", "Mixpanel", "Tableau"],
     chartType: "bar",
     compatibleWith: [],
+    inputType: "flow",
     sampleData: {
       labels: ["방문", "장바구니", "결제"],
       datasets: [{ label: "사용자", data: [1000, 320, 110] }]
+    },
+    exampleData: {
+      labels: ["방문", "상품 조회", "장바구니", "결제 시도", "구매 완료"],
+      values: [1000, 520, 320, 180, 110]
     }
   },
   {
@@ -487,9 +641,14 @@ const CHARTS = [
     tools: ["Jira", "Notion", "MS Project"],
     chartType: "bar",
     compatibleWith: [],
+    inputType: "flow",
     sampleData: {
       labels: ["기획", "디자인", "개발"],
       datasets: [{ label: "기간(일)", data: [7, 10, 21] }]
+    },
+    exampleData: {
+      labels: ["기획", "디자인", "개발", "테스트", "배포"],
+      values: [7, 10, 21, 5, 2]
     }
   },
   {
@@ -503,9 +662,14 @@ const CHARTS = [
     tools: ["D3.js", "Tableau", "파이썬"],
     chartType: "bar",
     compatibleWith: [],
+    inputType: "flow",
     sampleData: {
       labels: ["유입→상품", "상품→결제", "결제→완료"],
       datasets: [{ label: "흐름량", data: [800, 350, 220] }]
+    },
+    exampleData: {
+      labels: ["유입→상품", "상품→장바구니", "장바구니→결제", "결제→완료", "완료→재구매"],
+      values: [1000, 520, 320, 180, 60]
     }
   },
   {
@@ -519,9 +683,14 @@ const CHARTS = [
     tools: ["Notion", "Miro", "Tableau"],
     chartType: "bar",
     compatibleWith: [],
+    inputType: "flow",
     sampleData: {
       labels: ["기획", "출시", "확장"],
       datasets: [{ label: "이벤트 수", data: [3, 6, 4] }]
+    },
+    exampleData: {
+      labels: ["기획", "개발", "베타", "정식 출시", "확장"],
+      values: [3, 6, 4, 8, 5]
     }
   },
 
@@ -537,9 +706,14 @@ const CHARTS = [
     tools: ["Tableau", "D3.js", "파이썬"],
     chartType: "bar",
     compatibleWith: [],
+    inputType: "ratio",
     sampleData: {
       labels: ["식품", "전자", "의류"],
       datasets: [{ label: "매출 비중", data: [45, 35, 20] }]
+    },
+    exampleData: {
+      labels: ["식품", "가전", "의류", "뷰티", "스포츠"],
+      values: [45, 28, 15, 8, 4]
     }
   },
   {
@@ -553,9 +727,14 @@ const CHARTS = [
     tools: ["PowerPoint", "Visio", "draw.io"],
     chartType: "bar",
     compatibleWith: [],
+    inputType: "relational",
     sampleData: {
       labels: ["임원", "팀장", "팀원"],
       datasets: [{ label: "인원", data: [3, 12, 48] }]
+    },
+    exampleData: {
+      labels: ["CEO", "CTO", "CFO", "CMO", "COO"],
+      values: [1, 3, 2, 2, 2]
     }
   },
   {
@@ -569,9 +748,14 @@ const CHARTS = [
     tools: ["XMind", "Miro", "Notion"],
     chartType: "bar",
     compatibleWith: [],
+    inputType: "relational",
     sampleData: {
       labels: ["전략", "운영", "기술"],
       datasets: [{ label: "노드 수", data: [8, 6, 10] }]
+    },
+    exampleData: {
+      labels: ["브랜딩", "SNS", "광고", "고객 관리", "데이터 분석"],
+      values: [8, 12, 10, 6, 7]
     }
   },
   {
@@ -585,9 +769,14 @@ const CHARTS = [
     tools: ["PowerPoint", "Miro", "Tableau"],
     chartType: "bar",
     compatibleWith: [],
+    inputType: "multiaxis",
     sampleData: {
       labels: ["1사분면", "2사분면", "3사분면"],
       datasets: [{ label: "항목 수", data: [5, 8, 3] }]
+    },
+    exampleData: {
+      labels: ["스타", "캐시카우", "물음표", "도그", "신사업"],
+      values: [12, 28, 8, 4, 15]
     }
   },
   {
@@ -601,9 +790,14 @@ const CHARTS = [
     tools: ["D3.js", "Tableau", "파이썬"],
     chartType: "bar",
     compatibleWith: [],
+    inputType: "ratio",
     sampleData: {
       labels: ["1단계", "2단계", "3단계"],
       datasets: [{ label: "비중", data: [50, 30, 20] }]
+    },
+    exampleData: {
+      labels: ["식품 > 신선", "식품 > 가공", "가전 > 대형", "가전 > 소형", "기타"],
+      values: [28, 18, 22, 14, 18]
     }
   },
 
@@ -619,9 +813,14 @@ const CHARTS = [
     tools: ["Tableau", "QGIS", "Mapbox"],
     chartType: "bar",
     compatibleWith: [],
+    inputType: "numeric",
     sampleData: {
       labels: ["서울", "경기", "부산"],
       datasets: [{ label: "지수", data: [88, 76, 62] }]
+    },
+    exampleData: {
+      labels: ["서울", "경기", "부산", "대구", "인천"],
+      values: [88, 76, 62, 58, 67]
     }
   },
   {
@@ -635,9 +834,14 @@ const CHARTS = [
     tools: ["Tableau", "Mapbox", "Leaflet"],
     chartType: "bar",
     compatibleWith: ["bar", "scatter"],
+    inputType: "multiaxis",
     sampleData: {
       labels: ["서울", "도쿄", "뉴욕"],
       datasets: [{ label: "매출", data: [500, 380, 620] }]
+    },
+    exampleData: {
+      labels: ["서울", "도쿄", "뉴욕", "런던", "파리"],
+      values: [500, 380, 620, 540, 420]
     }
   },
   {
@@ -651,9 +855,14 @@ const CHARTS = [
     tools: ["Mapbox", "Leaflet", "Kepler.gl"],
     chartType: "bar",
     compatibleWith: [],
+    inputType: "distribution",
     sampleData: {
       labels: ["A지구", "B지구", "C지구"],
       datasets: [{ label: "밀도", data: [120, 90, 60] }]
+    },
+    exampleData: {
+      labels: ["A 지구", "B 지구", "C 지구", "D 지구", "E 지구"],
+      values: [120, 90, 60, 45, 78]
     }
   },
   {
@@ -667,9 +876,14 @@ const CHARTS = [
     tools: ["Kepler.gl", "Mapbox", "D3.js"],
     chartType: "bar",
     compatibleWith: [],
+    inputType: "flow",
     sampleData: {
       labels: ["서울→도쿄", "도쿄→LA", "LA→파리"],
       datasets: [{ label: "이동량", data: [320, 410, 180] }]
+    },
+    exampleData: {
+      labels: ["서울→도쿄", "도쿄→LA", "LA→파리", "파리→서울", "서울→베이징"],
+      values: [320, 410, 180, 260, 380]
     }
   },
 
@@ -685,9 +899,14 @@ const CHARTS = [
     tools: ["TradingView", "파이썬", "Highcharts"],
     chartType: "bar",
     compatibleWith: [],
+    inputType: "timeseries",
     sampleData: {
       labels: ["월", "화", "수"],
       datasets: [{ label: "종가", data: [125, 138, 132] }]
+    },
+    exampleData: {
+      labels: ["1/15", "1/16", "1/17", "1/18", "1/19"],
+      values: [72000, 74500, 73200, 75800, 76100]
     }
   },
   {
@@ -701,9 +920,14 @@ const CHARTS = [
     tools: ["TradingView", "Highcharts", "파이썬"],
     chartType: "bar",
     compatibleWith: [],
+    inputType: "timeseries",
     sampleData: {
       labels: ["1일", "2일", "3일"],
       datasets: [{ label: "종가", data: [105, 112, 108] }]
+    },
+    exampleData: {
+      labels: ["1일", "2일", "3일", "4일", "5일"],
+      values: [105, 112, 108, 118, 121]
     }
   },
   {
@@ -717,9 +941,14 @@ const CHARTS = [
     tools: ["엑셀", "PowerBI", "Tableau"],
     chartType: "bar",
     compatibleWith: [],
+    inputType: "flow",
     sampleData: {
       labels: ["매출", "원가", "이익"],
       datasets: [{ label: "금액", data: [1000, -600, 400] }]
+    },
+    exampleData: {
+      labels: ["매출", "COGS", "판관비", "영업이익", "순이익"],
+      values: [1000, -600, -200, 200, 150]
     }
   },
   {
@@ -733,9 +962,14 @@ const CHARTS = [
     tools: ["Tableau", "PowerBI", "엑셀"],
     chartType: "bar",
     compatibleWith: [],
+    inputType: "numeric",
     sampleData: {
       labels: ["목표", "실적", "예측"],
       datasets: [{ label: "달성", data: [100, 78, 92] }]
+    },
+    exampleData: {
+      labels: ["실적", "목표", "전년", "평균", "최고"],
+      values: [87, 100, 75, 82, 110]
     }
   },
 
@@ -751,9 +985,14 @@ const CHARTS = [
     tools: ["파이썬", "R", "wordcloud2"],
     chartType: "bar",
     compatibleWith: [],
+    inputType: "distribution",
     sampleData: {
       labels: ["가성비", "디자인", "배송"],
       datasets: [{ label: "빈도", data: [120, 80, 50] }]
+    },
+    exampleData: {
+      labels: ["가성비", "디자인", "배송", "품질", "서비스"],
+      values: [120, 80, 50, 95, 60]
     }
   },
   {
@@ -767,9 +1006,14 @@ const CHARTS = [
     tools: ["Notion", "TimelineJS", "Miro"],
     chartType: "bar",
     compatibleWith: [],
+    inputType: "timeseries",
     sampleData: {
       labels: ["2020", "2022", "2024"],
       datasets: [{ label: "이벤트 수", data: [4, 7, 5] }]
+    },
+    exampleData: {
+      labels: ["2020", "2021", "2022", "2023", "2024"],
+      values: [3, 5, 7, 6, 8]
     }
   },
   {
@@ -783,9 +1027,14 @@ const CHARTS = [
     tools: ["Gephi", "D3.js", "파이썬"],
     chartType: "bar",
     compatibleWith: [],
+    inputType: "relational",
     sampleData: {
       labels: ["A-B", "B-C", "A-C"],
       datasets: [{ label: "연결 강도", data: [50, 30, 20] }]
+    },
+    exampleData: {
+      labels: ["AI-데이터", "AI-알고리즘", "데이터-품질", "알고리즘-성능", "데이터-보안"],
+      values: [80, 65, 70, 55, 40]
     }
   },
   {
@@ -799,9 +1048,14 @@ const CHARTS = [
     tools: ["Gephi", "NodeXL", "D3.js"],
     chartType: "bar",
     compatibleWith: [],
+    inputType: "relational",
     sampleData: {
       labels: ["A→B", "B→C", "C→A"],
       datasets: [{ label: "연결", data: [4, 6, 3] }]
+    },
+    exampleData: {
+      labels: ["A→B", "B→C", "C→A", "A→D", "D→B"],
+      values: [4, 6, 3, 2, 5]
     }
   },
 
@@ -817,9 +1071,14 @@ const CHARTS = [
     tools: ["D3.js", "Tableau", "파이썬"],
     chartType: "bar",
     compatibleWith: [],
+    inputType: "ratio",
     sampleData: {
       labels: ["완료", "진행", "대기"],
       datasets: [{ label: "비율(%)", data: [60, 25, 15] }]
+    },
+    exampleData: {
+      labels: ["완료", "진행", "대기", "취소", "보류"],
+      values: [60, 22, 10, 5, 3]
     }
   },
   {
@@ -833,9 +1092,14 @@ const CHARTS = [
     tools: ["PowerPoint", "Canva", "Infogram"],
     chartType: "bar",
     compatibleWith: [],
+    inputType: "ratio",
     sampleData: {
       labels: ["찬성", "반대", "중립"],
       datasets: [{ label: "응답자", data: [7, 2, 1] }]
+    },
+    exampleData: {
+      labels: ["찬성", "반대", "중립", "기권", "미응답"],
+      values: [6, 2, 1, 1, 0]
     }
   },
   {
@@ -849,9 +1113,14 @@ const CHARTS = [
     tools: ["엑셀", "Tableau", "PowerBI"],
     chartType: "bar",
     compatibleWith: [],
+    inputType: "ratio",
     sampleData: {
       labels: ["A", "B", "C"],
       datasets: [{ label: "비율", data: [40, 35, 25] }]
+    },
+    exampleData: {
+      labels: ["A", "B", "C", "D", "E"],
+      values: [40, 25, 18, 12, 5]
     }
   },
   {
@@ -865,9 +1134,14 @@ const CHARTS = [
     tools: ["D3.js", "Tableau", "PowerBI"],
     chartType: "bar",
     compatibleWith: [],
+    inputType: "ratio",
     sampleData: {
       labels: ["달성", "잔여"],
       datasets: [{ label: "비율", data: [72, 28] }]
+    },
+    exampleData: {
+      labels: ["달성", "잔여"],
+      values: [72, 28]
     }
   },
 
@@ -883,9 +1157,14 @@ const CHARTS = [
     tools: ["엑셀", "Tableau", "Chart.js"],
     chartType: "bar",
     compatibleWith: [],
+    inputType: "multiaxis",
     sampleData: {
       labels: ["1월", "2월", "3월"],
       datasets: [{ label: "매출", data: [120, 180, 220] }]
+    },
+    exampleData: {
+      labels: ["1월", "2월", "3월", "4월", "5월"],
+      values: [120, 180, 240, 310, 380]
     }
   },
   {
@@ -899,9 +1178,14 @@ const CHARTS = [
     tools: ["PowerBI", "Tableau", "Looker"],
     chartType: "bar",
     compatibleWith: [],
+    inputType: "numeric",
     sampleData: {
       labels: ["전주", "금주", "변화"],
       datasets: [{ label: "DAU", data: [4200, 4680, 480] }]
+    },
+    exampleData: {
+      labels: ["DAU", "전주", "변화", "목표", "최고"],
+      values: [4680, 4200, 480, 5000, 5230]
     }
   },
   {
@@ -915,9 +1199,14 @@ const CHARTS = [
     tools: ["엑셀", "PowerBI", "Highcharts"],
     chartType: "bar",
     compatibleWith: [],
+    inputType: "numeric",
     sampleData: {
       labels: ["현재", "목표", "최대"],
       datasets: [{ label: "값", data: [72, 100, 120] }]
+    },
+    exampleData: {
+      labels: ["현재", "목표", "최대", "평균", "최소"],
+      values: [72, 100, 120, 68, 50]
     }
   },
   {
@@ -931,9 +1220,430 @@ const CHARTS = [
     tools: ["Tableau", "PowerBI", "D3.js"],
     chartType: "bar",
     compatibleWith: [],
+    inputType: "multiaxis",
     sampleData: {
       labels: ["A팀", "B팀", "C팀"],
       datasets: [{ label: "달성률", data: [85, 110, 72] }]
+    },
+    exampleData: {
+      labels: ["A팀", "B팀", "C팀", "D팀", "E팀"],
+      values: [85, 110, 72, 95, 68]
+    }
+  },
+
+  // ===== 통계 (7) - 신규 =====
+  {
+    id: "qq-plot",
+    name: "Q-Q 플롯",
+    category: "통계",
+    tags: ["통계", "정규성", "고급"],
+    description: "이론 분포(보통 정규분포)와 실제 데이터의 분위수를 점으로 비교해 정규성 여부를 확인하는 통계 차트.",
+    useCases: ["데이터 정규성 검정", "잔차 분포 점검", "회귀 진단"],
+    difficulty: "고급",
+    tools: ["파이썬", "R", "SPSS"],
+    chartType: "bar",
+    compatibleWith: [],
+    inputType: "distribution",
+    exampleData: {
+      labels: ["-2σ", "-1σ", "0", "+1σ", "+2σ"],
+      values: [-1.85, -0.92, 0.05, 0.88, 1.93]
+    }
+  },
+  {
+    id: "error-bar",
+    name: "오차막대",
+    category: "통계",
+    tags: ["통계", "오차", "중급"],
+    description: "측정값에 표준편차나 신뢰구간을 함께 표시해 측정의 불확실성을 시각화하는 차트.",
+    useCases: ["실험 결과 보고", "평균과 분산 비교", "측정 정밀도 표시"],
+    difficulty: "중급",
+    tools: ["파이썬", "R", "엑셀"],
+    chartType: "bar",
+    compatibleWith: [],
+    inputType: "distribution",
+    exampleData: {
+      labels: ["조건 A", "조건 B", "조건 C", "조건 D", "조건 E"],
+      values: [42, 58, 51, 67, 49]
+    }
+  },
+  {
+    id: "pdf-curve",
+    name: "확률밀도함수",
+    category: "통계",
+    tags: ["통계", "분포", "고급"],
+    description: "연속 변수의 확률 밀도를 곡선으로 표현해 분포 형태와 집중도를 보여주는 차트.",
+    useCases: ["정규분포 시각화", "분포 비교", "베이즈 사후분포"],
+    difficulty: "고급",
+    tools: ["파이썬", "R", "Mathematica"],
+    chartType: "line",
+    compatibleWith: [],
+    inputType: "distribution",
+    exampleData: {
+      labels: ["-3", "-1.5", "0", "+1.5", "+3"],
+      values: [4, 24, 40, 24, 4]
+    }
+  },
+  {
+    id: "cdf-curve",
+    name: "누적분포함수",
+    category: "통계",
+    tags: ["통계", "누적", "고급"],
+    description: "값이 특정 임계값 이하일 확률을 누적해 보여주는 S자 곡선 차트.",
+    useCases: ["위험 분석", "품질관리 검사", "응답 시간 분석"],
+    difficulty: "고급",
+    tools: ["파이썬", "R", "엑셀"],
+    chartType: "line",
+    compatibleWith: [],
+    inputType: "distribution",
+    exampleData: {
+      labels: ["10%", "30%", "50%", "70%", "90%"],
+      values: [10, 30, 50, 70, 90]
+    }
+  },
+  {
+    id: "correlation-heatmap",
+    name: "상관 히트맵",
+    category: "통계",
+    tags: ["통계", "상관", "중급"],
+    description: "변수 간 상관계수를 색 농도 매트릭스로 시각화해 다변량 관계를 한눈에 보여주는 차트.",
+    useCases: ["피처 선택", "다중공선성 점검", "EDA"],
+    difficulty: "중급",
+    tools: ["파이썬", "R", "Tableau"],
+    chartType: "bar",
+    compatibleWith: [],
+    inputType: "multiaxis",
+    exampleData: {
+      labels: ["X1-X2", "X1-X3", "X2-X3", "X1-Y", "X2-Y"],
+      values: [85, 30, 55, 72, 40]
+    }
+  },
+  {
+    id: "residual-plot",
+    name: "잔차 플롯",
+    category: "통계",
+    tags: ["통계", "회귀", "고급"],
+    description: "회귀 분석의 잔차(관측-예측)를 점으로 찍어 모델의 적합도와 패턴을 진단하는 차트.",
+    useCases: ["회귀 진단", "이분산성 점검", "비선형성 탐지"],
+    difficulty: "고급",
+    tools: ["파이썬", "R", "Stata"],
+    chartType: "bar",
+    compatibleWith: [],
+    inputType: "distribution",
+    exampleData: {
+      labels: ["관측1", "관측2", "관측3", "관측4", "관측5"],
+      values: [2.1, -1.4, 0.3, -0.8, 1.6]
+    }
+  },
+  {
+    id: "kaplan-meier",
+    name: "카플란-마이어",
+    category: "통계",
+    tags: ["통계", "생존분석", "고급"],
+    description: "시간 경과에 따른 생존(이탈하지 않을) 확률을 계단형 곡선으로 보여주는 생존분석 차트.",
+    useCases: ["환자 생존율 분석", "고객 이탈율", "제품 수명 분석"],
+    difficulty: "고급",
+    tools: ["파이썬", "R", "SPSS"],
+    chartType: "line",
+    compatibleWith: [],
+    inputType: "timeseries",
+    exampleData: {
+      labels: ["0개월", "6개월", "12개월", "18개월", "24개월"],
+      values: [100, 82, 65, 52, 41]
+    }
+  },
+
+  // ===== 금융(신규 5) =====
+  {
+    id: "bollinger-bands",
+    name: "볼린저 밴드",
+    category: "금융",
+    tags: ["금융", "변동성", "고급"],
+    description: "이동평균선 위아래에 표준편차 밴드를 표시해 가격 변동성을 시각화하는 트레이딩 차트.",
+    useCases: ["주가 변동성 분석", "과매수/과매도 판단", "단기 트레이딩 전략"],
+    difficulty: "고급",
+    tools: ["TradingView", "파이썬", "Highcharts"],
+    chartType: "line",
+    compatibleWith: [],
+    inputType: "timeseries",
+    exampleData: {
+      labels: ["1일", "2일", "3일", "4일", "5일"],
+      values: [125, 130, 128, 135, 138]
+    }
+  },
+  {
+    id: "volume-bar",
+    name: "거래량 바",
+    category: "금융",
+    tags: ["금융", "거래량", "초급"],
+    description: "일별/시간별 거래량을 막대로 표시해 시장 활동성과 유동성을 보여주는 차트.",
+    useCases: ["주식 거래량 분석", "거래 패턴 확인", "유동성 점검"],
+    difficulty: "초급",
+    tools: ["TradingView", "Yahoo Finance", "파이썬"],
+    chartType: "bar",
+    compatibleWith: [],
+    inputType: "timeseries",
+    exampleData: {
+      labels: ["월", "화", "수", "목", "금"],
+      values: [120, 180, 95, 210, 160]
+    }
+  },
+  {
+    id: "moving-average",
+    name: "이동평균선",
+    category: "금융",
+    tags: ["금융", "추세", "중급"],
+    description: "지정 기간의 평균 값을 이어 단기/장기 추세를 부드럽게 보여주는 차트.",
+    useCases: ["주가 추세 분석", "5/20/60일선 비교", "골든크로스 탐지"],
+    difficulty: "중급",
+    tools: ["TradingView", "파이썬", "엑셀"],
+    chartType: "line",
+    compatibleWith: [],
+    inputType: "timeseries",
+    exampleData: {
+      labels: ["1주", "2주", "3주", "4주", "5주"],
+      values: [95, 102, 108, 115, 121]
+    }
+  },
+  {
+    id: "return-distribution",
+    name: "수익률 분포",
+    category: "금융",
+    tags: ["금융", "리스크", "고급"],
+    description: "기간 수익률의 분포 형태를 히스토그램으로 보여주는 리스크 분석용 차트.",
+    useCases: ["포트폴리오 리스크", "꼬리 위험 점검", "수익 분포 비교"],
+    difficulty: "고급",
+    tools: ["파이썬", "R", "엑셀"],
+    chartType: "bar",
+    compatibleWith: [],
+    inputType: "distribution",
+    exampleData: {
+      labels: ["-10%", "-5%", "0%", "+5%", "+10%"],
+      values: [3, 18, 42, 25, 7]
+    }
+  },
+  {
+    id: "correlation-matrix",
+    name: "상관 매트릭스(금융)",
+    category: "금융",
+    tags: ["금융", "상관", "중급"],
+    description: "여러 자산의 수익률 상관관계를 매트릭스로 시각화해 포트폴리오 분산에 활용하는 차트.",
+    useCases: ["포트폴리오 다각화", "자산 군집화", "위험 관리"],
+    difficulty: "중급",
+    tools: ["파이썬", "R", "Bloomberg"],
+    chartType: "bar",
+    compatibleWith: [],
+    inputType: "multiaxis",
+    exampleData: {
+      labels: ["주식-채권", "주식-원자재", "채권-원자재", "주식-부동산", "채권-부동산"],
+      values: [-30, 45, 15, 55, 5]
+    }
+  },
+
+  // ===== 경제 (6) - 신규 =====
+  {
+    id: "lorenz-curve",
+    name: "로렌츠 곡선",
+    category: "경제",
+    tags: ["경제", "불평등", "고급"],
+    description: "인구 누적 비율과 소득 누적 비율을 이은 곡선으로 소득 불평등을 보여주는 경제학 차트.",
+    useCases: ["소득 불평등 분석", "자산 분배 비교", "지역 격차 측정"],
+    difficulty: "고급",
+    tools: ["엑셀", "파이썬", "R"],
+    chartType: "line",
+    compatibleWith: [],
+    inputType: "distribution",
+    exampleData: {
+      labels: ["하위 20%", "하위 40%", "하위 60%", "하위 80%", "상위 100%"],
+      values: [5, 14, 28, 52, 100]
+    }
+  },
+  {
+    id: "supply-demand",
+    name: "수요공급 곡선",
+    category: "경제",
+    tags: ["경제", "균형", "초급"],
+    description: "가격에 따른 수요량과 공급량을 두 곡선으로 표현해 균형 가격을 보여주는 미시경제 차트.",
+    useCases: ["균형 가격 분석", "가격탄력성 비교", "시장 분석"],
+    difficulty: "초급",
+    tools: ["엑셀", "PowerPoint", "파이썬"],
+    chartType: "line",
+    compatibleWith: [],
+    inputType: "numeric",
+    exampleData: {
+      labels: ["가격 100", "가격 200", "가격 300", "가격 400", "가격 500"],
+      values: [500, 400, 300, 200, 100]
+    }
+  },
+  {
+    id: "phillips-curve",
+    name: "필립스 곡선",
+    category: "경제",
+    tags: ["경제", "거시", "중급"],
+    description: "실업률과 인플레이션율의 반비례 관계를 곡선으로 보여주는 거시경제 차트.",
+    useCases: ["통화정책 분석", "고용-물가 트레이드오프", "경기 사이클 평가"],
+    difficulty: "중급",
+    tools: ["FRED", "파이썬", "엑셀"],
+    chartType: "line",
+    compatibleWith: [],
+    inputType: "multiaxis",
+    exampleData: {
+      labels: ["실업 3%", "실업 4%", "실업 5%", "실업 6%", "실업 7%"],
+      values: [5.5, 4.2, 3.1, 2.4, 1.8]
+    }
+  },
+  {
+    id: "ppf-curve",
+    name: "생산가능곡선",
+    category: "경제",
+    tags: ["경제", "효율", "초급"],
+    description: "두 재화의 생산 조합을 곡선으로 표현해 기회비용과 효율성을 보여주는 차트.",
+    useCases: ["기회비용 분석", "생산 효율성", "경제 교과서 자료"],
+    difficulty: "초급",
+    tools: ["엑셀", "PowerPoint", "Mathematica"],
+    chartType: "line",
+    compatibleWith: [],
+    inputType: "numeric",
+    exampleData: {
+      labels: ["빵 0", "빵 25", "빵 50", "빵 75", "빵 100"],
+      values: [100, 85, 60, 30, 0]
+    }
+  },
+  {
+    id: "business-cycle",
+    name: "경기순환",
+    category: "경제",
+    tags: ["경제", "순환", "중급"],
+    description: "확장/정점/수축/저점의 4단계 경기 사이클을 파동으로 표현하는 차트.",
+    useCases: ["경기 국면 진단", "투자 시점 분석", "정책 평가"],
+    difficulty: "중급",
+    tools: ["FRED", "엑셀", "파이썬"],
+    chartType: "line",
+    compatibleWith: [],
+    inputType: "timeseries",
+    exampleData: {
+      labels: ["2020", "2021", "2022", "2023", "2024"],
+      values: [85, 102, 115, 98, 108]
+    }
+  },
+  {
+    id: "gini-index",
+    name: "지니계수",
+    category: "경제",
+    tags: ["경제", "불평등", "중급"],
+    description: "0(완전평등)~1(완전불평등) 사이로 소득 분배 정도를 막대로 비교하는 차트.",
+    useCases: ["국가별 불평등 비교", "연도별 변화 추이", "정책 효과 평가"],
+    difficulty: "중급",
+    tools: ["엑셀", "파이썬", "R"],
+    chartType: "bar",
+    compatibleWith: [],
+    inputType: "numeric",
+    exampleData: {
+      labels: ["한국", "미국", "일본", "독일", "프랑스"],
+      values: [0.34, 0.41, 0.33, 0.30, 0.32]
+    }
+  },
+
+  // ===== 사회 (6) - 신규 =====
+  {
+    id: "population-pyramid",
+    name: "인구 피라미드",
+    category: "사회",
+    tags: ["사회", "인구", "중급"],
+    description: "연령대별 남녀 인구를 좌우 대칭 막대로 표현하는 인구 구조 분석 차트.",
+    useCases: ["고령화 분석", "국가별 인구 비교", "세대 분석"],
+    difficulty: "중급",
+    tools: ["통계청", "파이썬", "Tableau"],
+    chartType: "bar",
+    compatibleWith: [],
+    inputType: "distribution",
+    exampleData: {
+      labels: ["0~9세", "10~19세", "20~39세", "40~64세", "65세+"],
+      values: [9, 11, 30, 35, 15]
+    }
+  },
+  {
+    id: "cohort-chart",
+    name: "코호트 차트",
+    category: "사회",
+    tags: ["사회", "코호트", "중급"],
+    description: "특정 기간에 가입/등록한 집단의 시간 경과에 따른 잔존율을 보여주는 차트.",
+    useCases: ["사용자 잔존율", "마케팅 코호트 분석", "고객 생애주기"],
+    difficulty: "중급",
+    tools: ["GA", "Mixpanel", "Tableau"],
+    chartType: "bar",
+    compatibleWith: [],
+    inputType: "timeseries",
+    exampleData: {
+      labels: ["1주", "2주", "4주", "8주", "12주"],
+      values: [100, 72, 55, 42, 33]
+    }
+  },
+  {
+    id: "likert-scale",
+    name: "리커트 척도",
+    category: "사회",
+    tags: ["사회", "설문", "초급"],
+    description: "5점/7점 척도 응답을 누적 막대로 표현해 의견 분포를 보여주는 설문 차트.",
+    useCases: ["만족도 조사", "의견 분포 분석", "사용자 경험 설문"],
+    difficulty: "초급",
+    tools: ["SurveyMonkey", "엑셀", "파이썬"],
+    chartType: "bar",
+    compatibleWith: [],
+    inputType: "distribution",
+    exampleData: {
+      labels: ["매우 불만", "불만", "보통", "만족", "매우 만족"],
+      values: [5, 12, 28, 38, 17]
+    }
+  },
+  {
+    id: "social-network",
+    name: "사회연결망",
+    category: "사회",
+    tags: ["사회", "관계망", "고급"],
+    description: "사람들 간의 친구/팔로우 관계를 노드와 엣지로 표현해 영향력과 군집을 분석하는 그래프.",
+    useCases: ["SNS 영향력 분석", "조직 내 협업망", "바이럴 확산 분석"],
+    difficulty: "고급",
+    tools: ["Gephi", "NodeXL", "D3.js"],
+    chartType: "bar",
+    compatibleWith: [],
+    inputType: "relational",
+    exampleData: {
+      labels: ["A-B", "B-C", "A-C", "A-D", "D-E"],
+      values: [8, 5, 3, 6, 4]
+    }
+  },
+  {
+    id: "age-gender-distribution",
+    name: "연령-성별 분포",
+    category: "사회",
+    tags: ["사회", "인구", "초급"],
+    description: "연령대별 비율을 누적 막대로 보여주는 인구 통계 차트.",
+    useCases: ["고객 세그먼트 분석", "유권자 분포", "건강 통계"],
+    difficulty: "초급",
+    tools: ["엑셀", "Tableau", "파이썬"],
+    chartType: "bar",
+    compatibleWith: [],
+    inputType: "distribution",
+    exampleData: {
+      labels: ["10대", "20대", "30대", "40대", "50대+"],
+      values: [12, 28, 32, 18, 10]
+    }
+  },
+  {
+    id: "survey-stacked",
+    name: "설문 누적 응답",
+    category: "사회",
+    tags: ["사회", "설문", "초급"],
+    description: "여러 질문의 응답 분포를 누적 막대로 나란히 비교하는 설문 결과 차트.",
+    useCases: ["설문 항목 간 비교", "고객 만족도 항목별 분석", "사내 진단"],
+    difficulty: "초급",
+    tools: ["엑셀", "Tableau", "SurveyMonkey"],
+    chartType: "bar",
+    compatibleWith: [],
+    inputType: "distribution",
+    exampleData: {
+      labels: ["Q1 가격", "Q2 디자인", "Q3 품질", "Q4 서비스", "Q5 배송"],
+      values: [78, 65, 82, 71, 88]
     }
   }
 ];
