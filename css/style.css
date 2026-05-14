@@ -743,3 +743,57 @@ body {
   text-align: center;
   transition: opacity 0.25s;
 }
+
+/* ===== 내보내기 안내 모달 ===== */
+#export-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 500;
+}
+
+.export-modal-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.55);
+}
+
+.export-modal-box {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: min(420px, calc(100vw - 32px));
+  background: #fff;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.25);
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.export-modal-content {
+  font-size: 14px;
+  line-height: 1.7;
+  color: #1f2937;
+}
+
+.export-modal-content small {
+  color: #6b7280;
+  font-size: 12px;
+}
+
+.export-modal-box button {
+  align-self: flex-end;
+  padding: 10px 22px;
+  font-size: 14px;
+  font-weight: 600;
+  font-family: inherit;
+  background: #2563EB;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.export-modal-box button:hover { background: #1D4ED8; }

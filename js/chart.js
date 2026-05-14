@@ -50,6 +50,9 @@ function renderDetail() {
 // 2. 빌더 초기화 / 폼 유틸
 // ===========================================
 function initBuilder() {
+  if (typeof Chart !== "undefined" && typeof ChartDataLabels !== "undefined") {
+    Chart.register(ChartDataLabels);
+  }
   applyInputTypeUI();
   document.getElementById("loadSampleBtn").addEventListener("click", loadSample);
   document.getElementById("renderBtn").addEventListener("click", renderChart);
@@ -884,6 +887,39 @@ function renderRichSVG(rows) {
   container.innerHTML = wrapped;
 }
 
+function _datalabelsConfig({ isPieLike, isMinimal }) {
+  if (isMinimal) return { display: false };
+  if (isPieLike) {
+    return {
+      display: true,
+      color: "#fff",
+      font: { size: 11, weight: "bold" },
+      formatter: (v) => {
+        if (v == null || v === "") return "";
+        const n = typeof v === "object" ? v.y ?? v.x : v;
+        return n != null ? Number(n).toLocaleString() : "";
+      }
+    };
+  }
+  return {
+    display: true,
+    anchor: "end",
+    align: "top",
+    offset: 2,
+    clip: false,
+    formatter: (v) => {
+      if (v == null || v === "") return "";
+      if (typeof v === "object") {
+        const n = v.y ?? v.x;
+        return n != null ? Number(n).toLocaleString() : "";
+      }
+      return Number(v).toLocaleString();
+    },
+    font: { size: 11, weight: "bold" },
+    color: "#333"
+  };
+}
+
 function renderChartJS(route, labels, numValues, colors) {
   if (chartInstance) {
     chartInstance.destroy();
@@ -956,8 +992,17 @@ function renderChartJS(route, labels, numValues, colors) {
     responsive: true,
     maintainAspectRatio: false,
     animation: { duration: 0 },
+    layout: { padding: { top: 8, right: 12, bottom: 4, left: 4 } },
     plugins: {
       legend: { display: isPieLike },
+      title: {
+        display: !route.minimal,
+        text: chart.name,
+        font: { size: 14, weight: "bold" },
+        color: "#1f2937",
+        padding: { top: 2, bottom: 8 }
+      },
+      datalabels: _datalabelsConfig({ isPieLike, isMinimal: !!route.minimal }),
       tooltip: {
         callbacks: {
           label: (ctx) => {
@@ -1056,7 +1101,11 @@ function switchToChartState() {
 
 // SVG 공통 helpers
 function _svgWrap(inner) {
-  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" preserveAspectRatio="xMidYMid meet" width="100%" height="100%" style="display:block">${inner}</svg>`;
+  const titleText = (typeof chart !== "undefined" && chart && chart.name) ? chart.name : "";
+  const title = titleText
+    ? `<text x="200" y="13" text-anchor="middle" font-size="13" font-weight="700" fill="#1f2937" font-family="sans-serif">${_esc(titleText)}</text>`
+    : "";
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" preserveAspectRatio="xMidYMid meet" width="100%" height="100%" style="display:block;background:#fff">${title}${inner}</svg>`;
 }
 
 function _esc(str) {
@@ -2349,6 +2398,12 @@ function _dateStamp() {
   return `${d.getFullYear()}${p(d.getMonth() + 1)}${p(d.getDate())}`;
 }
 
+function _dateReadable() {
+  const d = new Date();
+  const p = (n) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`;
+}
+
 function _triggerDownload(href, filename) {
   const link = document.createElement("a");
   link.download = filename;
@@ -2390,10 +2445,10 @@ function exportImage(kind) {
     const img = new Image();
     img.onload = function () {
       const canvas = document.createElement("canvas");
-      canvas.width = 800;
-      canvas.height = 450;
+      canvas.width = 1600;
+      canvas.height = 900;
       const ctx = canvas.getContext("2d");
-      ctx.fillStyle = "#fff";
+      ctx.fillStyle = "#ffffff";
       ctx.fillRect(0, 0, canvas.width, canvas.height);
       ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
       URL.revokeObjectURL(url);
@@ -2401,14 +2456,12 @@ function exportImage(kind) {
     };
     img.onerror = function () {
       URL.revokeObjectURL(url);
-      // html2canvas 폴백
       _exportViaHtml2Canvas(kind, filename);
     };
     img.src = url;
     return;
   }
 
-  // 둘 다 없으면 html2canvas로 캡처
   _exportViaHtml2Canvas(kind, filename);
 }
 
@@ -2418,7 +2471,7 @@ function _exportViaHtml2Canvas(kind, filename) {
     return;
   }
   const target = document.querySelector(".builder-canvas");
-  html2canvas(target, { backgroundColor: "#fff", scale: 2 })
+  html2canvas(target, { scale: 2, useCORS: true, backgroundColor: "#ffffff" })
     .then((canvas) => {
       const mime = kind === "jpg" ? "image/jpeg" : "image/png";
       _triggerDownload(canvas.toDataURL(mime, 0.95), filename);
@@ -2430,8 +2483,8 @@ function _exportViaHtml2Canvas(kind, filename) {
 }
 
 function exportSVG() {
-  const filename = `${_baseFileName()}.svg`;
   if (lastSVGString) {
+    const filename = `${_baseFileName()}.svg`;
     const blob = new Blob([lastSVGString], { type: "image/svg+xml;charset=utf-8" });
     const url = URL.createObjectURL(blob);
     _triggerDownload(url, filename);
@@ -2439,19 +2492,97 @@ function exportSVG() {
     return;
   }
   if (chartInstance) {
-    showToast("SVG는 이 차트 유형에서 지원되지 않습니다. PNG/JPG로 저장해주세요.");
+    showToast("이 차트는 SVG 형식을 지원하지 않습니다. PNG로 저장됩니다.");
+    setTimeout(() => exportImage("png"), 500);
     return;
   }
   showToast("내보낼 그래프가 없습니다");
 }
 
-function _buildExportRows() {
-  const schema = getInputSchema();
-  const rows = readForm().filter((r) =>
+// -----------------------------------------------------------
+// 데이터 변환 헬퍼: inputType별 CSV / HTML 테이블 / 평문 변환
+// -----------------------------------------------------------
+const _CSV_HEADERS = {
+  numeric: ["항목명", "수치", "색상"],
+  ratio: ["항목명", "수치", "색상"],
+  timeseries: ["날짜", "수치"],
+  relational: ["노드명", "수치", "색상"],
+  flow: ["단계", "수치", "색상"],
+  distribution: ["구간", "빈도", "색상"],
+  multiaxis: ["항목명", "수치", "색상"],
+  ohlc: ["날짜", "시가", "고가", "저가", "종가"],
+  bollinger: ["날짜", "종가", "이동평균", "상단밴드", "하단밴드"],
+  boxplot: ["그룹명", "최솟값", "Q1", "중앙값", "Q3", "최댓값"],
+  qqplot: ["이론값(X)", "관측값(Y)"],
+  survival: ["시간", "생존율"],
+  waterfall: ["항목명", "증감값", "유형"],
+  lorenz: ["누적인구비율(%)", "누적소득비율(%)"],
+  curve: ["X값", "곡선1(Y)", "곡선2(Y)"],
+  pyramid: ["연령대", "남성", "여성"],
+  likert: ["항목", "매우부정(%)", "부정(%)", "중립(%)", "긍정(%)", "매우긍정(%)"],
+  network: ["노드명", "연결 노드들"],
+  timeline: ["연도/날짜", "사건명", "설명"],
+  hierarchical: ["상위 항목", "1차 가지", "2차 세부"]
+};
+
+const _CSV_FIELDS = {
+  numeric: ["label", "value", "color"],
+  ratio: ["label", "value", "color"],
+  timeseries: ["label", "value"],
+  relational: ["label", "value", "color"],
+  flow: ["label", "value", "color"],
+  distribution: ["label", "value", "color"],
+  multiaxis: ["label", "value", "color"],
+  ohlc: ["date", "open", "high", "low", "close"],
+  bollinger: ["date", "close", "ma", "upper", "lower"],
+  boxplot: ["label", "min", "q1", "median", "q3", "max"],
+  qqplot: ["x", "y"],
+  survival: ["time", "rate"],
+  waterfall: ["label", "value", "type"],
+  lorenz: ["popPct", "incomePct"],
+  curve: ["x", "y1", "y2"],
+  pyramid: ["age", "male", "female"],
+  likert: ["label", "v1", "v2", "v3", "v4", "v5"],
+  network: ["node", "links"],
+  timeline: ["date", "event", "desc"],
+  hierarchical: ["parent", "child", "leaf"]
+};
+
+const _WATERFALL_TYPE_LABEL = { increase: "증가", decrease: "감소", total: "합계" };
+
+function _exportInputKey(chartObj) {
+  return INPUT_SCHEMA_OVERRIDES[chartObj.id] || chartObj.inputType || "numeric";
+}
+
+function _exportRows() {
+  return readForm().filter((r) =>
     Object.values(r).some((v) => String(v).trim() !== "")
   );
-  const headers = schema.fields.map((f) => f.label);
-  const dataRows = rows.map((r) => schema.fields.map((f) => r[f.key] ?? ""));
+}
+
+function _cellDisplay(key, field, raw) {
+  if (key === "waterfall" && field === "type") {
+    return _WATERFALL_TYPE_LABEL[raw] || raw || "";
+  }
+  return raw ?? "";
+}
+
+function _heatmapMatrix(rows) {
+  const rowsSet = [];
+  const colsSet = [];
+  rows.forEach((r) => {
+    if (r.row && !rowsSet.includes(r.row)) rowsSet.push(r.row);
+    if (r.col && !colsSet.includes(r.col)) colsSet.push(r.col);
+  });
+  const cellMap = {};
+  rows.forEach((r) => {
+    cellMap[`${r.row}|${r.col}`] = r.value ?? "";
+  });
+  const headers = ["", ...colsSet];
+  const dataRows = rowsSet.map((rL) => [
+    rL,
+    ...colsSet.map((cL) => cellMap[`${rL}|${cL}`] ?? "")
+  ]);
   return { headers, dataRows };
 }
 
@@ -2464,6 +2595,46 @@ function _toCSV(headers, rows) {
   return [headers, ...rows].map((row) => row.map(esc).join(",")).join("\r\n");
 }
 
+function _exportShape(chartObj, rows) {
+  const key = _exportInputKey(chartObj);
+  if (key === "heatmap") return _heatmapMatrix(rows);
+  const headers = _CSV_HEADERS[key] || _CSV_HEADERS.numeric;
+  const fields = _CSV_FIELDS[key] || _CSV_FIELDS.numeric;
+  const dataRows = rows.map((r) => fields.map((f) => _cellDisplay(key, f, r[f])));
+  return { headers, dataRows };
+}
+
+function convertToCSV(chartObj, rows) {
+  const { headers, dataRows } = _exportShape(chartObj, rows);
+  return _toCSV(headers, dataRows);
+}
+
+function convertToHTMLTable(chartObj, rows) {
+  const { headers, dataRows } = _exportShape(chartObj, rows);
+  const head = `<tr>${headers.map((h) => `<th>${_esc(h)}</th>`).join("")}</tr>`;
+  const body = dataRows
+    .map((r) => `<tr>${r.map((c) => `<td>${_esc(c)}</td>`).join("")}</tr>`)
+    .join("");
+  return [
+    `<h2>${_esc(chartObj.name || "")}</h2>`,
+    chartObj.description ? `<p>${_esc(chartObj.description)}</p>` : "",
+    `<p><b>생성일:</b> ${_dateReadable()}</p>`,
+    `<table border="1" cellspacing="0" cellpadding="6">${head}${body}</table>`
+  ].join("");
+}
+
+function convertToPlainText(chartObj, rows) {
+  const { headers, dataRows } = _exportShape(chartObj, rows);
+  const lines = [];
+  lines.push(chartObj.name || "");
+  if (chartObj.description) lines.push(chartObj.description);
+  lines.push(`생성일: ${_dateReadable()}`);
+  lines.push("");
+  lines.push(headers.join("\t"));
+  dataRows.forEach((r) => lines.push(r.map((c) => String(c ?? "")).join("\t")));
+  return lines.join("\n");
+}
+
 async function _copyToClipboard(text) {
   try {
     if (navigator.clipboard && window.isSecureContext) {
@@ -2473,7 +2644,6 @@ async function _copyToClipboard(text) {
   } catch (e) {
     // fallthrough
   }
-  // fallback
   const ta = document.createElement("textarea");
   ta.value = text;
   ta.style.position = "fixed";
@@ -2491,32 +2661,78 @@ async function _copyToClipboard(text) {
   return ok;
 }
 
+async function _copyHTMLAndText(html, plain) {
+  try {
+    if (navigator.clipboard && window.ClipboardItem && window.isSecureContext) {
+      const htmlBlob = new Blob([html], { type: "text/html" });
+      const textBlob = new Blob([plain], { type: "text/plain" });
+      await navigator.clipboard.write([
+        new ClipboardItem({
+          "text/html": htmlBlob,
+          "text/plain": textBlob
+        })
+      ]);
+      return true;
+    }
+  } catch (e) {
+    // fallthrough
+  }
+  return _copyToClipboard(plain);
+}
+
 async function exportGoogleSheets() {
-  const { headers, dataRows } = _buildExportRows();
-  const csv = _toCSV(headers, dataRows);
-  const ok = await _copyToClipboard(csv);
-  window.open("https://docs.google.com/spreadsheets/create", "_blank", "noopener,noreferrer");
-  showToast(ok
-    ? "데이터가 클립보드에 복사됐어요! 구글 시트에서 붙여넣기(Ctrl+V) 하세요"
-    : "구글 시트 새 탭을 열었어요. 데이터 복사는 수동으로 진행해주세요."
-  );
+  const rows = _exportRows();
+  if (rows.length === 0) {
+    showToast("내보낼 데이터가 없습니다");
+    return;
+  }
+  const csv = convertToCSV(chart, rows);
+  await _copyToClipboard(csv);
+  window.open("https://docs.google.com/spreadsheets/d/create", "_blank", "noopener,noreferrer");
+  showExportModal(`
+    <b>구글 시트가 열렸어요!</b><br><br>
+    아래 순서로 데이터를 붙여넣으세요:<br>
+    ① A1 셀 클릭<br>
+    ② Ctrl+V (Mac: Cmd+V)<br>
+    ③ "텍스트를 열로 분리" 선택 → 쉼표 구분<br><br>
+    <small>데이터가 클립보드에 복사되어 있어요.</small>
+  `);
 }
 
 async function exportGoogleDocs() {
-  const { headers, dataRows } = _buildExportRows();
-  const lines = [];
-  lines.push(`■ ${chart.name}`);
-  if (chart.description) lines.push(chart.description);
-  lines.push("");
-  lines.push(headers.join("\t"));
-  dataRows.forEach((r) => lines.push(r.join("\t")));
-  const text = lines.join("\n");
-  const ok = await _copyToClipboard(text);
+  const rows = _exportRows();
+  if (rows.length === 0) {
+    showToast("내보낼 데이터가 없습니다");
+    return;
+  }
+  const html = convertToHTMLTable(chart, rows);
+  const plain = convertToPlainText(chart, rows);
+  await _copyHTMLAndText(html, plain);
   window.open("https://docs.google.com/document/create", "_blank", "noopener,noreferrer");
-  showToast(ok
-    ? "내용이 클립보드에 복사됐어요! 구글 독스에서 붙여넣기(Ctrl+V) 하세요"
-    : "구글 독스 새 탭을 열었어요. 내용 복사는 수동으로 진행해주세요."
-  );
+  showExportModal(`
+    <b>구글 독스가 열렸어요!</b><br><br>
+    ① 문서 빈 곳 클릭<br>
+    ② Ctrl+V (Mac: Cmd+V)<br><br>
+    차트 제목, 설명, 데이터 표가 붙여넣어집니다.<br>
+    <small>서식 포함 데이터가 클립보드에 복사되어 있어요.</small>
+  `);
+}
+
+function showExportModal(htmlContent) {
+  document.getElementById("export-modal")?.remove();
+  const modal = document.createElement("div");
+  modal.id = "export-modal";
+  modal.innerHTML = `
+    <div class="export-modal-backdrop"></div>
+    <div class="export-modal-box">
+      <div class="export-modal-content">${htmlContent}</div>
+      <button type="button">확인</button>
+    </div>
+  `;
+  const close = () => modal.remove();
+  modal.querySelector(".export-modal-backdrop").addEventListener("click", close);
+  modal.querySelector("button").addEventListener("click", close);
+  document.body.appendChild(modal);
 }
 
 function showToast(msg) {
@@ -2712,8 +2928,17 @@ function renderChartMixed() {
       responsive: true,
       maintainAspectRatio: false,
       animation: { duration: 0 },
+      layout: { padding: { top: 8, right: 12, bottom: 4, left: 4 } },
       plugins: {
         legend: { display: true },
+        title: {
+          display: true,
+          text: chart.name,
+          font: { size: 14, weight: "bold" },
+          color: "#1f2937",
+          padding: { top: 2, bottom: 8 }
+        },
+        datalabels: _datalabelsConfig({ isPieLike: false, isMinimal: false }),
         tooltip: {
           callbacks: {
             label: (ctx) => {
