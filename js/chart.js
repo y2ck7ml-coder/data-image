@@ -1,5 +1,6 @@
 // ===========================================
 // 0. URL/엘리먼트/페이지 초기화
+// (실제 부트스트랩은 파일 맨 끝의 boot() 호출에서 수행 — 모든 const가 선언된 후 실행되어야 TDZ 에러를 피함)
 // ===========================================
 const params = new URLSearchParams(location.search);
 const chartId = params.get("id");
@@ -7,21 +8,6 @@ const chart = CHARTS.find((c) => c.id === chartId);
 
 const tabsEl = document.getElementById("categoryTabs");
 const mainEl = document.getElementById("chartDetail");
-
-if (!chart) {
-  renderTabs(null);
-  mainEl.innerHTML = `
-    <div class="detail-empty">
-      <p>요청하신 차트를 찾을 수 없습니다.</p>
-      <a href="index.html">목록으로 돌아가기</a>
-    </div>
-  `;
-} else {
-  document.title = `${chart.name} · Data Gallery`;
-  renderTabs(chart.category);
-  renderDetail();
-  initBuilder();
-}
 
 // ===========================================
 // 1. 카테고리 탭 + 상세 정보
@@ -112,24 +98,6 @@ function getUnit(isMix = false) {
   return sel.value || "";
 }
 
-function loadSample() {
-  // exampleData(차트별 맞춤 예시)가 있으면 우선 사용, 없으면 기존 sampleData
-  const labels =
-    chart.exampleData?.labels ||
-    chart.sampleData?.labels ||
-    [];
-  const values =
-    chart.exampleData?.values ||
-    chart.sampleData?.datasets?.[0]?.data ||
-    [];
-  document.querySelectorAll('[data-field="label"]').forEach((el, i) => {
-    el.value = labels[i] ?? "";
-  });
-  document.querySelectorAll('[data-field="value"]').forEach((el, i) => {
-    el.value = values[i] ?? "";
-  });
-}
-
 // 입력 색상 팔레트 (5행 기준)
 const DEFAULT_COLORS = ["#2563EB", "#60A5FA", "#93C5FD", "#F59E0B", "#10B981"];
 
@@ -156,12 +124,11 @@ const INPUT_TYPE_SCHEMAS = {
     ]
   },
   timeseries: {
-    rowCount: 5,
+    rowCount: 6,
     hint: "시간 순서대로 날짜·기간과 그에 해당하는 수치를 입력하세요.",
     fields: [
-      { key: "label", label: "날짜 / 기간", inputType: "text" },
-      { key: "value", label: "수치", inputType: "number" },
-      { key: "color", label: "색상", inputType: "color" }
+      { key: "label", label: "날짜 / 기간", inputType: "text", placeholder: "예: 2024-01" },
+      { key: "value", label: "수치", inputType: "number" }
     ]
   },
   relational: {
@@ -227,7 +194,7 @@ const INPUT_TYPE_SCHEMAS = {
     ]
   },
   boxplot: {
-    rowCount: 4,
+    rowCount: 3,
     rowLabel: (i) => `그룹 ${i + 1}`,
     hint: "그룹별 최솟값/Q1/중앙값/Q3/최댓값을 입력하세요.",
     fields: [
@@ -240,7 +207,7 @@ const INPUT_TYPE_SCHEMAS = {
     ]
   },
   qqplot: {
-    rowCount: 8,
+    rowCount: 6,
     rowLabel: (i) => `데이터 ${i + 1}`,
     hint: "이론값(X)과 실제 관측값(Y) 쌍을 여러 개 입력하세요.",
     fields: [
@@ -261,25 +228,31 @@ const INPUT_TYPE_SCHEMAS = {
   survival: {
     rowCount: 6,
     rowLabel: (i) => `시점 ${i + 1}`,
-    hint: "시간 포인트와 생존율, 이벤트 발생 여부를 입력하세요.",
+    hint: "시간(기간)과 그 시점의 생존율(0~1)을 입력하세요.",
     fields: [
-      { key: "time", label: "시간(개월)", inputType: "text" },
-      { key: "rate", label: "생존율(%)", inputType: "number" },
-      { key: "event", label: "이벤트(0/1)", inputType: "number" }
+      { key: "time", label: "시간(기간)", inputType: "number" },
+      { key: "rate", label: "생존율(0~1)", inputType: "number" }
     ]
   },
   waterfall: {
-    rowCount: 5,
+    rowCount: 6,
     rowLabel: (i) => `항목 ${i + 1}`,
-    hint: "항목명과 증감값(양수=증가, 음수=감소)을 입력하세요.",
+    hint: "항목명과 증감값, 유형(증가/감소/합계)을 선택하세요.",
     fields: [
       { key: "label", label: "항목명", inputType: "text" },
       { key: "value", label: "증감값", inputType: "number" },
-      { key: "color", label: "색상", inputType: "color" }
+      {
+        key: "type", label: "유형", inputType: "select",
+        options: [
+          { value: "increase", label: "증가" },
+          { value: "decrease", label: "감소" },
+          { value: "total", label: "합계" }
+        ]
+      }
     ]
   },
   lorenz: {
-    rowCount: 6,
+    rowCount: 5,
     rowLabel: (i) => `구간 ${i + 1}`,
     hint: "누적 인구 비율(%)과 그 시점의 누적 소득 비율(%)을 입력하세요.",
     fields: [
@@ -288,9 +261,9 @@ const INPUT_TYPE_SCHEMAS = {
     ]
   },
   curve: {
-    rowCount: 6,
-    rowLabel: (i) => `가격 ${i + 1}`,
-    hint: "X축 값과 두 곡선(예: 수요·공급)의 Y값을 입력하세요.",
+    rowCount: 5,
+    rowLabel: (i) => `포인트 ${i + 1}`,
+    hint: "X축 값과 두 곡선의 Y값을 입력하세요. (곡선 명칭은 차트에 맞춰 자동 표시)",
     fields: [
       { key: "x", label: "X축 값", inputType: "number" },
       { key: "y1", label: "곡선 1 (Y)", inputType: "number" },
@@ -321,12 +294,12 @@ const INPUT_TYPE_SCHEMAS = {
     ]
   },
   network: {
-    rowCount: 6,
+    rowCount: 5,
     rowLabel: (i) => `노드 ${i + 1}`,
     hint: "노드명과 연결된 노드명들(쉼표 구분)을 입력하세요.",
     fields: [
       { key: "node", label: "노드명", inputType: "text" },
-      { key: "links", label: "연결 노드(쉼표 구분)", inputType: "text" }
+      { key: "links", label: "연결 노드들", inputType: "text", placeholder: "노드B, 노드C" }
     ]
   },
   timeline: {
@@ -462,55 +435,58 @@ const EXAMPLE_RICH = {
     { row: "3월 가입", col: "1주", value: 100 }, { row: "3월 가입", col: "2주", value: 82 }, { row: "3월 가입", col: "4주", value: 68 }
   ],
   "kaplan-meier": [
-    { time: "0개월", rate: 100, event: 0 }, { time: "3개월", rate: 92, event: 1 },
-    { time: "6개월", rate: 82, event: 1 }, { time: "12개월", rate: 65, event: 1 },
-    { time: "18개월", rate: 52, event: 1 }, { time: "24개월", rate: 41, event: 1 }
+    { time: 0, rate: 1.00 }, { time: 3, rate: 0.92 },
+    { time: 6, rate: 0.82 }, { time: 12, rate: 0.65 },
+    { time: 18, rate: 0.52 }, { time: 24, rate: 0.41 }
   ],
   waterfall: [
-    { label: "시작 잔액", value: 1000, color: "#2563EB" },
-    { label: "신규 매출", value: 450, color: "#16A34A" },
-    { label: "환불", value: -80, color: "#DC2626" },
-    { label: "비용", value: -220, color: "#DC2626" },
-    { label: "최종", value: 1150, color: "#2563EB" }
+    { label: "시작 잔액", value: 1000, type: "increase" },
+    { label: "신규 매출", value: 450, type: "increase" },
+    { label: "환불", value: -80, type: "decrease" },
+    { label: "비용", value: -220, type: "decrease" },
+    { label: "조정", value: 0, type: "increase" },
+    { label: "최종", value: 1150, type: "total" }
   ],
   "waterfall-finance": [
-    { label: "매출", value: 1000, color: "#16A34A" },
-    { label: "COGS", value: -600, color: "#DC2626" },
-    { label: "판관비", value: -200, color: "#DC2626" },
-    { label: "영업이익", value: 200, color: "#16A34A" },
-    { label: "순이익", value: 150, color: "#2563EB" }
+    { label: "매출", value: 1000, type: "increase" },
+    { label: "COGS", value: -600, type: "decrease" },
+    { label: "판관비", value: -200, type: "decrease" },
+    { label: "영업이익", value: 200, type: "total" },
+    { label: "기타이익", value: 50, type: "increase" },
+    { label: "순이익", value: 150, type: "total" }
   ],
   cascade: [
-    { label: "매출", value: 1000, color: "#0891B2" },
-    { label: "원가", value: -600, color: "#DC2626" },
-    { label: "판관비", value: -200, color: "#DC2626" },
-    { label: "영업이익", value: 200, color: "#0891B2" },
-    { label: "순이익", value: 150, color: "#2563EB" }
+    { label: "매출", value: 1000, type: "increase" },
+    { label: "원가", value: -600, type: "decrease" },
+    { label: "판관비", value: -200, type: "decrease" },
+    { label: "영업이익", value: 200, type: "total" },
+    { label: "이자비용", value: -50, type: "decrease" },
+    { label: "순이익", value: 150, type: "total" }
   ],
   "lorenz-curve": [
-    { popPct: 0, incomePct: 0 }, { popPct: 20, incomePct: 5 },
-    { popPct: 40, incomePct: 14 }, { popPct: 60, incomePct: 28 },
-    { popPct: 80, incomePct: 52 }, { popPct: 100, incomePct: 100 }
+    { popPct: 20, incomePct: 5 }, { popPct: 40, incomePct: 14 },
+    { popPct: 60, incomePct: 28 }, { popPct: 80, incomePct: 52 },
+    { popPct: 100, incomePct: 100 }
   ],
   "gini-index": [
-    { popPct: 0, incomePct: 0 }, { popPct: 20, incomePct: 6 },
-    { popPct: 40, incomePct: 16 }, { popPct: 60, incomePct: 32 },
-    { popPct: 80, incomePct: 58 }, { popPct: 100, incomePct: 100 }
+    { popPct: 20, incomePct: 6 }, { popPct: 40, incomePct: 16 },
+    { popPct: 60, incomePct: 32 }, { popPct: 80, incomePct: 58 },
+    { popPct: 100, incomePct: 100 }
   ],
   "supply-demand": [
     { x: 100, y1: 500, y2: 100 }, { x: 200, y1: 400, y2: 200 },
     { x: 300, y1: 300, y2: 300 }, { x: 400, y1: 200, y2: 400 },
-    { x: 500, y1: 150, y2: 500 }, { x: 600, y1: 100, y2: 600 }
+    { x: 500, y1: 100, y2: 500 }
   ],
   "phillips-curve": [
-    { x: 3, y1: 5.5, y2: null }, { x: 4, y1: 4.2, y2: null },
-    { x: 5, y1: 3.1, y2: null }, { x: 6, y1: 2.4, y2: null },
-    { x: 7, y1: 1.8, y2: null }, { x: 8, y1: 1.4, y2: null }
+    { x: 3, y1: 5.5, y2: "" }, { x: 4, y1: 4.2, y2: "" },
+    { x: 5, y1: 3.1, y2: "" }, { x: 6, y1: 2.4, y2: "" },
+    { x: 7, y1: 1.8, y2: "" }
   ],
   "ppf-curve": [
-    { x: 0, y1: 100, y2: null }, { x: 25, y1: 95, y2: null },
-    { x: 50, y1: 82, y2: null }, { x: 75, y1: 60, y2: null },
-    { x: 90, y1: 35, y2: null }, { x: 100, y1: 0, y2: null }
+    { x: 0, y1: 100, y2: "" }, { x: 25, y1: 95, y2: "" },
+    { x: 50, y1: 82, y2: "" }, { x: 75, y1: 60, y2: "" },
+    { x: 100, y1: 0, y2: "" }
   ],
   pyramid: [
     { age: "임원", male: 3, female: 2 },
@@ -600,6 +576,12 @@ function buildInputForm() {
   for (let i = 0; i < schema.rowCount; i++) {
     const rowTitle = schema.rowLabel ? schema.rowLabel(i) : `데이터 ${i + 1}`;
     const fieldsHtml = schema.fields.map((f) => {
+      if (f.inputType === "select") {
+        const opts = (f.options || []).map((o) =>
+          `<option value="${o.value}">${o.label}</option>`
+        ).join("");
+        return `<label>${f.label}<select data-field="${f.key}" data-index="${i}">${opts}</select></label>`;
+      }
       const valAttr =
         f.inputType === "color"
           ? `value="${DEFAULT_COLORS[i % DEFAULT_COLORS.length]}"`
@@ -2003,14 +1985,16 @@ function svgRichHeatmap(rows) {
 
 function svgRichSurvival(rows) {
   const data = rows.map((r) => ({
-    time: r.time || "",
-    rate: _toNum(r.rate),
-    event: _toNum(r.event)
+    time: r.time,
+    rate: _toNum(r.rate)
   }));
+  // rate 값이 1보다 크면 % 단위로 가정하고 0~1로 정규화
+  const maxRate = Math.max(...data.map((d) => d.rate));
+  if (maxRate > 1.5) data.forEach((d) => (d.rate /= 100));
   const sx = 40, sy = 25, W = 330, H = 165;
   const N = data.length;
   const scaleX = (i) => sx + (N > 1 ? (i / (N - 1)) * W : W / 2);
-  const scaleY = (v) => sy + (1 - v / 100) * H;
+  const scaleY = (v) => sy + (1 - Math.max(0, Math.min(1, v))) * H;
   let path = `M ${scaleX(0).toFixed(1)},${scaleY(data[0].rate).toFixed(1)}`;
   for (let i = 1; i < N; i++) {
     path += ` L ${scaleX(i).toFixed(1)},${scaleY(data[i - 1].rate).toFixed(1)}`;
@@ -2021,9 +2005,7 @@ function svgRichSurvival(rows) {
   s += `<line x1="${sx}" y1="${sy}" x2="${sx}" y2="${sy + H}" stroke="#cbd5e1" stroke-width="0.6"/>`;
   s += `<path d="${path}" stroke="#059669" stroke-width="2.5" fill="none"/>`;
   data.forEach((d, i) => {
-    if (d.event > 0) {
-      s += `<line x1="${scaleX(i).toFixed(1)}" y1="${(scaleY(d.rate) - 5).toFixed(1)}" x2="${scaleX(i).toFixed(1)}" y2="${(scaleY(d.rate) + 5).toFixed(1)}" stroke="#059669" stroke-width="1.5"/>`;
-    }
+    s += `<circle cx="${scaleX(i).toFixed(1)}" cy="${scaleY(d.rate).toFixed(1)}" r="3" fill="#059669"/>`;
     s += `<text x="${scaleX(i).toFixed(1)}" y="${sy + H + 16}" text-anchor="middle" font-size="10" fill="#6b7280" font-family="sans-serif">${_esc(d.time)}</text>`;
   });
   return s;
@@ -2033,20 +2015,19 @@ function svgRichWaterfall(rows) {
   const data = rows.map((r) => ({
     label: r.label || "",
     value: _toNum(r.value),
-    color: r.color || ""
+    type: r.type || (r.value >= 0 ? "increase" : "decrease")
   }));
   let running = 0;
-  const segs = data.map((d, i) => {
-    const isLast = i === data.length - 1;
-    if (isLast && Math.abs(d.value) > 0) {
-      // 마지막은 누적 결과를 표시
-      const start = 0;
-      const end = d.value;
-      return { start, end, value: d.value, label: d.label, color: d.color || "#2563EB", isLast: true };
+  const colorFor = (t) =>
+    t === "total" ? "#2563EB" : t === "decrease" ? "#DC2626" : "#16A34A";
+  const segs = data.map((d) => {
+    if (d.type === "total") {
+      // 합계 막대는 누적값(0~running)을 표시
+      return { start: 0, end: running, value: running, label: d.label, color: colorFor("total"), isTotal: true };
     }
     const start = running;
     running += d.value;
-    return { start, end: running, value: d.value, label: d.label, color: d.color || (d.value >= 0 ? "#16A34A" : "#DC2626") };
+    return { start, end: running, value: d.value, label: d.label, color: colorFor(d.type) };
   });
   const allVals = segs.flatMap((sg) => [sg.start, sg.end]);
   const min = Math.min(0, ...allVals);
@@ -2066,7 +2047,7 @@ function svgRichWaterfall(rows) {
     const bot = scaleY(Math.min(sg.start, sg.end));
     const h = Math.max(2, bot - top);
     s += `<rect x="${x.toFixed(1)}" y="${top.toFixed(1)}" width="${(segW - 12).toFixed(1)}" height="${h.toFixed(1)}" fill="${sg.color}"/>`;
-    if (i < N - 1 && !sg.isLast) {
+    if (i < N - 1 && !sg.isTotal) {
       const xRight = x + segW - 12;
       const xNext = sx + segW * (i + 1) + 6;
       const yLine = scaleY(sg.end);
@@ -2132,9 +2113,14 @@ function svgRichCurve(rows, kind) {
     if (d.y1 != null) s += `<circle cx="${scaleX(d.x).toFixed(1)}" cy="${scaleY(d.y1).toFixed(1)}" r="3" fill="#0E7490"/>`;
     if (d.y2 != null) s += `<circle cx="${scaleX(d.x).toFixed(1)}" cy="${scaleY(d.y2).toFixed(1)}" r="3" fill="#DC2626"/>`;
   });
-  if (kind === "supply-demand") {
-    s += `<text x="${sx + W - 40}" y="${sy + 15}" font-size="10" fill="#0E7490" font-family="sans-serif">수요 (Demand)</text>`;
-    s += `<text x="${sx + W - 40}" y="${sy + 30}" font-size="10" fill="#DC2626" font-family="sans-serif">공급 (Supply)</text>`;
+  const labels = {
+    "supply-demand": ["수요 (Demand)", "공급 (Supply)"],
+    "phillips-curve": ["인플레이션율", "실업률"],
+    "ppf-curve": ["상품 A", "상품 B"]
+  }[kind];
+  if (labels) {
+    s += `<text x="${sx + W - 90}" y="${sy + 15}" font-size="10" fill="#0E7490" font-family="sans-serif">${_esc(labels[0])}</text>`;
+    s += `<text x="${sx + W - 90}" y="${sy + 30}" font-size="10" fill="#DC2626" font-family="sans-serif">${_esc(labels[1])}</text>`;
   }
   return s;
 }
@@ -2788,4 +2774,22 @@ function safeRedirect(url) {
   if (typeof url === "string" && allowed.some((a) => url.startsWith(a))) {
     window.open(url, "_blank", "noopener,noreferrer");
   }
+}
+
+// ===========================================
+// 8. 부트스트랩 (마지막에 실행 — 위쪽 const들이 모두 초기화된 뒤여야 TDZ 에러를 피함)
+// ===========================================
+if (!chart) {
+  renderTabs(null);
+  mainEl.innerHTML = `
+    <div class="detail-empty">
+      <p>요청하신 차트를 찾을 수 없습니다.</p>
+      <a href="index.html">목록으로 돌아가기</a>
+    </div>
+  `;
+} else {
+  document.title = `${chart.name} · Data Gallery`;
+  renderTabs(chart.category);
+  renderDetail();
+  initBuilder();
 }
