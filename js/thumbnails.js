@@ -603,7 +603,241 @@ const THUMBNAILS = {
     '<line x1="58" y1="28" x2="58" y2="44" stroke="#0F172A" stroke-width="2"/>' +
     '<rect x="10" y="52" width="78" height="10" fill="#BFDBFE"/>' +
     '<rect x="10" y="54" width="65" height="6" fill="#1D4ED8"/>' +
-    '<line x1="72" y1="49" x2="72" y2="65" stroke="#0F172A" stroke-width="2"/>'
+    '<line x1="72" y1="49" x2="72" y2="65" stroke="#0F172A" stroke-width="2"/>',
+
+  // ===== 통계 신규 #059669 =====
+  "qq-plot":
+    _BG +
+    '<line x1="12" y1="62" x2="88" y2="12" stroke="#059669" stroke-width="1" stroke-dasharray="3,2"/>' +
+    [
+      [18, 58], [25, 52], [32, 48], [40, 42], [48, 36],
+      [55, 30], [62, 26], [70, 22], [78, 16], [85, 14]
+    ]
+      .map(([x, y]) => `<circle cx="${x}" cy="${y}" r="2" fill="#059669"/>`)
+      .join(""),
+
+  "error-bar":
+    _BG +
+    [[16, 25, 8], [33, 35, 10], [50, 18, 6], [67, 30, 9], [84, 22, 7]]
+      .map(([x, top, err]) =>
+        `<rect x="${x - 4}" y="${top + 5}" width="8" height="${65 - top - 5}" fill="#059669"/>` +
+        `<line x1="${x}" y1="${top - err}" x2="${x}" y2="${top + err}" stroke="#064e3b" stroke-width="1.2"/>` +
+        `<line x1="${x - 4}" y1="${top - err}" x2="${x + 4}" y2="${top - err}" stroke="#064e3b" stroke-width="1.2"/>` +
+        `<line x1="${x - 4}" y1="${top + err}" x2="${x + 4}" y2="${top + err}" stroke="#064e3b" stroke-width="1.2"/>`
+      ).join(""),
+
+  "pdf-curve":
+    _BG +
+    '<path d="M 8,62 Q 25,60 35,52 Q 45,18 50,16 Q 55,18 65,52 Q 75,60 92,62 Z" fill="#A7F3D0" fill-opacity="0.7"/>' +
+    '<path d="M 8,62 Q 25,60 35,52 Q 45,18 50,16 Q 55,18 65,52 Q 75,60 92,62" stroke="#059669" stroke-width="1.8" fill="none"/>',
+
+  "cdf-curve":
+    _BG +
+    '<path d="M 8,62 Q 25,62 32,58 Q 42,52 50,37 Q 58,22 68,16 Q 80,12 92,12" stroke="#059669" stroke-width="2" fill="none"/>' +
+    '<line x1="8" y1="62" x2="92" y2="62" stroke="#94a3b8" stroke-width="0.5"/>' +
+    '<line x1="8" y1="12" x2="92" y2="12" stroke="#94a3b8" stroke-width="0.5" stroke-dasharray="2,2"/>',
+
+  "correlation-heatmap":
+    _BG +
+    [0.9, 0.4, 0.7, 0.2, 0.4, 0.9, 0.5, 0.6, 0.7, 0.5, 0.9, 0.3, 0.2, 0.6, 0.3, 0.9]
+      .map((op, i) => {
+        const r = Math.floor(i / 4);
+        const c = i % 4;
+        return `<rect x="${20 + c * 15}" y="${8 + r * 15}" width="13" height="13" fill="#059669" fill-opacity="${op}"/>`;
+      })
+      .join(""),
+
+  "residual-plot":
+    _BG +
+    '<line x1="10" y1="37" x2="90" y2="37" stroke="#059669" stroke-width="1" stroke-dasharray="3,2"/>' +
+    [
+      [16, 28], [22, 45], [28, 32], [35, 48], [42, 30],
+      [50, 42], [58, 28], [66, 46], [74, 32], [82, 44], [88, 30]
+    ]
+      .map(([x, y]) => `<circle cx="${x}" cy="${y}" r="2" fill="#059669"/>`)
+      .join(""),
+
+  "kaplan-meier":
+    _BG +
+    '<polyline points="8,15 20,15 20,22 32,22 32,32 44,32 44,42 56,42 56,50 68,50 68,56 80,56 80,62 92,62" stroke="#059669" stroke-width="2" fill="none"/>' +
+    '<line x1="8" y1="65" x2="92" y2="65" stroke="#94a3b8" stroke-width="0.5"/>',
+
+  // ===== 금융 신규 #B45309 =====
+  "bollinger-bands":
+    _BG +
+    '<path d="M 8,20 Q 22,18 36,22 Q 50,16 64,20 Q 78,14 92,18 L 92,30 Q 78,26 64,32 Q 50,28 36,34 Q 22,30 8,32 Z" fill="#FDE68A" fill-opacity="0.6"/>' +
+    '<polyline points="8,20 22,18 36,22 50,16 64,20 78,14 92,18" stroke="#92400E" stroke-width="1" fill="none" stroke-dasharray="2,2"/>' +
+    '<polyline points="8,32 22,30 36,34 50,28 64,32 78,26 92,30" stroke="#92400E" stroke-width="1" fill="none" stroke-dasharray="2,2"/>' +
+    '<polyline points="8,26 22,24 36,28 50,22 64,26 78,20 92,24" stroke="#B45309" stroke-width="2" fill="none"/>',
+
+  "volume-bar":
+    _BG +
+    '<rect x="12" y="45" width="10" height="20" fill="#16A34A"/>' +
+    '<rect x="26" y="32" width="10" height="33" fill="#16A34A"/>' +
+    '<rect x="40" y="50" width="10" height="15" fill="#DC2626"/>' +
+    '<rect x="54" y="22" width="10" height="43" fill="#16A34A"/>' +
+    '<rect x="68" y="40" width="10" height="25" fill="#DC2626"/>' +
+    '<rect x="82" y="28" width="10" height="37" fill="#16A34A"/>',
+
+  "moving-average":
+    _BG +
+    '<polyline points="8,50 16,38 22,45 28,30 34,42 40,25 48,40 55,28 62,35 70,20 78,32 86,22 92,30" stroke="#FCD34D" stroke-width="1.5" fill="none"/>' +
+    '<path d="M 8,48 Q 25,42 40,38 Q 55,32 70,28 Q 85,24 92,22" stroke="#B45309" stroke-width="2.5" fill="none"/>',
+
+  "return-distribution":
+    _BG +
+    '<rect x="10" y="58" width="8" height="7" fill="#FCA5A5"/>' +
+    '<rect x="20" y="50" width="8" height="15" fill="#FCA5A5"/>' +
+    '<rect x="30" y="38" width="8" height="27" fill="#B45309"/>' +
+    '<rect x="40" y="22" width="8" height="43" fill="#B45309"/>' +
+    '<rect x="50" y="15" width="8" height="50" fill="#B45309"/>' +
+    '<rect x="60" y="28" width="8" height="37" fill="#B45309"/>' +
+    '<rect x="70" y="46" width="8" height="19" fill="#B45309"/>' +
+    '<rect x="80" y="56" width="8" height="9" fill="#B45309"/>' +
+    '<line x1="20" y1="10" x2="20" y2="65" stroke="#DC2626" stroke-width="1" stroke-dasharray="2,2"/>',
+
+  "correlation-matrix":
+    _BG +
+    [0.9, 0.3, 0.6, 0.7, 0.3, 0.9, 0.4, 0.5, 0.6, 0.4, 0.9, 0.6, 0.7, 0.5, 0.6, 0.9]
+      .map((op, i) => {
+        const r = Math.floor(i / 4);
+        const c = i % 4;
+        return `<rect x="${20 + c * 15}" y="${8 + r * 15}" width="13" height="13" fill="#B45309" fill-opacity="${op}"/>`;
+      })
+      .join(""),
+
+  // ===== 경제 신규 #0E7490 =====
+  "lorenz-curve":
+    _BG +
+    '<line x1="10" y1="65" x2="90" y2="10" stroke="#94a3b8" stroke-width="1" stroke-dasharray="2,2"/>' +
+    '<path d="M 10,65 Q 35,62 55,52 Q 75,38 90,10 L 10,65 Z" fill="#A5F3FC" fill-opacity="0.7"/>' +
+    '<path d="M 10,65 Q 35,62 55,52 Q 75,38 90,10" stroke="#0E7490" stroke-width="2" fill="none"/>',
+
+  "supply-demand":
+    _BG +
+    '<line x1="10" y1="10" x2="10" y2="65" stroke="#94a3b8" stroke-width="0.5"/>' +
+    '<line x1="10" y1="65" x2="90" y2="65" stroke="#94a3b8" stroke-width="0.5"/>' +
+    '<path d="M 12,15 Q 40,40 88,62" stroke="#0E7490" stroke-width="2" fill="none"/>' +
+    '<path d="M 12,62 Q 40,40 88,15" stroke="#DC2626" stroke-width="2" fill="none"/>' +
+    '<circle cx="50" cy="38" r="3" fill="#0F172A"/>',
+
+  "phillips-curve":
+    _BG +
+    '<line x1="10" y1="10" x2="10" y2="65" stroke="#94a3b8" stroke-width="0.5"/>' +
+    '<line x1="10" y1="65" x2="90" y2="65" stroke="#94a3b8" stroke-width="0.5"/>' +
+    '<path d="M 15,15 Q 25,30 45,45 Q 65,55 88,60" stroke="#0E7490" stroke-width="2.5" fill="none"/>',
+
+  "ppf-curve":
+    _BG +
+    '<line x1="10" y1="10" x2="10" y2="65" stroke="#94a3b8" stroke-width="0.5"/>' +
+    '<line x1="10" y1="65" x2="90" y2="65" stroke="#94a3b8" stroke-width="0.5"/>' +
+    '<path d="M 12,15 Q 50,18 88,62" stroke="#0E7490" stroke-width="2.5" fill="none"/>' +
+    '<path d="M 12,15 Q 50,18 88,62 L 12,62 Z" fill="#A5F3FC" fill-opacity="0.4"/>',
+
+  "business-cycle":
+    _BG +
+    '<line x1="8" y1="37" x2="92" y2="37" stroke="#94a3b8" stroke-width="0.5" stroke-dasharray="2,2"/>' +
+    '<path d="M 8,40 Q 20,18 32,40 Q 44,62 56,40 Q 68,18 80,40 Q 86,52 92,38" stroke="#0E7490" stroke-width="2" fill="none"/>',
+
+  "gini-index":
+    _BG +
+    '<line x1="10" y1="65" x2="90" y2="10" stroke="#94a3b8" stroke-width="1" stroke-dasharray="2,2"/>' +
+    '<path d="M 10,65 Q 35,62 55,52 Q 75,38 90,10" stroke="#0E7490" stroke-width="2" fill="none"/>' +
+    '<path d="M 10,65 L 90,10 Q 75,38 55,52 Q 35,62 10,65 Z" fill="#0E7490" fill-opacity="0.25"/>',
+
+  // ===== 사회 신규 #BE185D =====
+  "population-pyramid":
+    _BG +
+    '<line x1="50" y1="8" x2="50" y2="66" stroke="#94a3b8" stroke-width="0.5"/>' +
+    '<rect x="34" y="12" width="16" height="7" fill="#60A5FA"/>' +
+    '<rect x="50" y="12" width="14" height="7" fill="#F472B6"/>' +
+    '<rect x="28" y="22" width="22" height="7" fill="#60A5FA"/>' +
+    '<rect x="50" y="22" width="20" height="7" fill="#F472B6"/>' +
+    '<rect x="20" y="32" width="30" height="7" fill="#60A5FA"/>' +
+    '<rect x="50" y="32" width="28" height="7" fill="#F472B6"/>' +
+    '<rect x="24" y="42" width="26" height="7" fill="#60A5FA"/>' +
+    '<rect x="50" y="42" width="28" height="7" fill="#F472B6"/>' +
+    '<rect x="30" y="52" width="20" height="7" fill="#60A5FA"/>' +
+    '<rect x="50" y="52" width="24" height="7" fill="#F472B6"/>',
+
+  "cohort-chart":
+    _BG +
+    [
+      [0.9, 0.7, 0.55, 0.4, 0.3],
+      [0, 0.85, 0.65, 0.5, 0.38],
+      [0, 0, 0.8, 0.62, 0.45],
+      [0, 0, 0, 0.78, 0.58],
+      [0, 0, 0, 0, 0.72]
+    ].flatMap((row, r) =>
+      row.map((op, c) => op > 0
+        ? `<rect x="${10 + c * 16}" y="${8 + r * 12}" width="15" height="11" fill="#BE185D" fill-opacity="${op}"/>`
+        : `<rect x="${10 + c * 16}" y="${8 + r * 12}" width="15" height="11" fill="#F3F4F6"/>`
+      )
+    ).join(""),
+
+  "likert-scale":
+    _BG +
+    '<line x1="50" y1="8" x2="50" y2="66" stroke="#94a3b8" stroke-width="0.5"/>' +
+    '<rect x="22" y="12" width="10" height="8" fill="#DC2626"/>' +
+    '<rect x="32" y="12" width="18" height="8" fill="#FCA5A5"/>' +
+    '<rect x="50" y="12" width="14" height="8" fill="#FCD34D"/>' +
+    '<rect x="64" y="12" width="18" height="8" fill="#86EFAC"/>' +
+    '<rect x="26" y="24" width="8" height="8" fill="#DC2626"/>' +
+    '<rect x="34" y="24" width="16" height="8" fill="#FCA5A5"/>' +
+    '<rect x="50" y="24" width="20" height="8" fill="#FCD34D"/>' +
+    '<rect x="70" y="24" width="14" height="8" fill="#86EFAC"/>' +
+    '<rect x="34" y="36" width="8" height="8" fill="#DC2626"/>' +
+    '<rect x="42" y="36" width="8" height="8" fill="#FCA5A5"/>' +
+    '<rect x="50" y="36" width="12" height="8" fill="#FCD34D"/>' +
+    '<rect x="62" y="36" width="22" height="8" fill="#86EFAC"/>' +
+    '<rect x="40" y="48" width="6" height="8" fill="#FCA5A5"/>' +
+    '<rect x="46" y="48" width="4" height="8" fill="#FCD34D"/>' +
+    '<rect x="50" y="48" width="18" height="8" fill="#86EFAC"/>' +
+    '<rect x="68" y="48" width="18" height="8" fill="#16A34A"/>',
+
+  "social-network":
+    _BG +
+    '<line x1="22" y1="18" x2="50" y2="37" stroke="#BE185D" stroke-width="1.2"/>' +
+    '<line x1="78" y1="18" x2="50" y2="37" stroke="#BE185D" stroke-width="1.2"/>' +
+    '<line x1="50" y1="37" x2="22" y2="56" stroke="#BE185D" stroke-width="1.2"/>' +
+    '<line x1="50" y1="37" x2="78" y2="56" stroke="#BE185D" stroke-width="1.2"/>' +
+    '<line x1="22" y1="18" x2="78" y2="18" stroke="#BE185D" stroke-width="1"/>' +
+    '<line x1="22" y1="56" x2="78" y2="56" stroke="#BE185D" stroke-width="1"/>' +
+    '<line x1="22" y1="18" x2="22" y2="56" stroke="#BE185D" stroke-width="1"/>' +
+    '<line x1="78" y1="18" x2="78" y2="56" stroke="#BE185D" stroke-width="1"/>' +
+    '<circle cx="22" cy="18" r="5" fill="#F472B6"/>' +
+    '<circle cx="78" cy="18" r="5" fill="#F472B6"/>' +
+    '<circle cx="50" cy="37" r="8" fill="#BE185D"/>' +
+    '<circle cx="22" cy="56" r="5" fill="#F472B6"/>' +
+    '<circle cx="78" cy="56" r="5" fill="#F472B6"/>',
+
+  "age-gender-distribution":
+    _BG +
+    [
+      [12, 30, 28], [28, 50, 48], [44, 40, 42], [60, 20, 22], [76, 12, 14]
+    ].flatMap(([x, m, f]) => [
+      `<rect x="${x}" y="${65 - m}" width="6" height="${m}" fill="#60A5FA"/>`,
+      `<rect x="${x + 7}" y="${65 - f}" width="6" height="${f}" fill="#F472B6"/>`
+    ]).join(""),
+
+  "survey-stacked":
+    _BG +
+    '<rect x="10" y="12" width="20" height="8" fill="#DC2626"/>' +
+    '<rect x="30" y="12" width="14" height="8" fill="#FCA5A5"/>' +
+    '<rect x="44" y="12" width="20" height="8" fill="#FCD34D"/>' +
+    '<rect x="64" y="12" width="26" height="8" fill="#86EFAC"/>' +
+    '<rect x="10" y="24" width="14" height="8" fill="#DC2626"/>' +
+    '<rect x="24" y="24" width="16" height="8" fill="#FCA5A5"/>' +
+    '<rect x="40" y="24" width="22" height="8" fill="#FCD34D"/>' +
+    '<rect x="62" y="24" width="28" height="8" fill="#86EFAC"/>' +
+    '<rect x="10" y="36" width="10" height="8" fill="#DC2626"/>' +
+    '<rect x="20" y="36" width="14" height="8" fill="#FCA5A5"/>' +
+    '<rect x="34" y="36" width="18" height="8" fill="#FCD34D"/>' +
+    '<rect x="52" y="36" width="38" height="8" fill="#86EFAC"/>' +
+    '<rect x="10" y="48" width="8" height="8" fill="#DC2626"/>' +
+    '<rect x="18" y="48" width="10" height="8" fill="#FCA5A5"/>' +
+    '<rect x="28" y="48" width="16" height="8" fill="#FCD34D"/>' +
+    '<rect x="44" y="48" width="46" height="8" fill="#86EFAC"/>'
 };
 
 function getThumbnail(id) {

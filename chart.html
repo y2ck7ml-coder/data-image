@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' cdn.jsdelivr.net; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'none';">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' cdn.jsdelivr.net cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'none';">
   <meta http-equiv="X-Frame-Options" content="DENY">
   <title>Data Gallery</title>
   <link rel="stylesheet" href="css/style.css">
@@ -93,38 +93,7 @@
 
         <p id="inputTypeHint" style="text-align: center; color: #6b7280; font-size: 13px; margin: 4px 0 14px;"></p>
 
-        <form class="builder-form" id="builderForm">
-          <div class="builder-col">
-            <span class="builder-col-title">데이터 1</span>
-            <label>데이터 명칭<input type="text" data-field="label" data-index="0"></label>
-            <label>숫자 데이터<input type="number" data-field="value" data-index="0"></label>
-            <label>색상<input type="color" data-field="color" data-index="0" value="#2563EB" style="height: 36px; padding: 2px; cursor: pointer;"></label>
-          </div>
-          <div class="builder-col">
-            <span class="builder-col-title">데이터 2</span>
-            <label>데이터 명칭<input type="text" data-field="label" data-index="1"></label>
-            <label>숫자 데이터<input type="number" data-field="value" data-index="1"></label>
-            <label>색상<input type="color" data-field="color" data-index="1" value="#60A5FA" style="height: 36px; padding: 2px; cursor: pointer;"></label>
-          </div>
-          <div class="builder-col">
-            <span class="builder-col-title">데이터 3</span>
-            <label>데이터 명칭<input type="text" data-field="label" data-index="2"></label>
-            <label>숫자 데이터<input type="number" data-field="value" data-index="2"></label>
-            <label>색상<input type="color" data-field="color" data-index="2" value="#93C5FD" style="height: 36px; padding: 2px; cursor: pointer;"></label>
-          </div>
-          <div class="builder-col">
-            <span class="builder-col-title">데이터 4</span>
-            <label>데이터 명칭<input type="text" data-field="label" data-index="3"></label>
-            <label>숫자 데이터<input type="number" data-field="value" data-index="3"></label>
-            <label>색상<input type="color" data-field="color" data-index="3" value="#F59E0B" style="height: 36px; padding: 2px; cursor: pointer;"></label>
-          </div>
-          <div class="builder-col">
-            <span class="builder-col-title">데이터 5</span>
-            <label>데이터 명칭<input type="text" data-field="label" data-index="4"></label>
-            <label>숫자 데이터<input type="number" data-field="value" data-index="4"></label>
-            <label>색상<input type="color" data-field="color" data-index="4" value="#10B981" style="height: 36px; padding: 2px; cursor: pointer;"></label>
-          </div>
-        </form>
+        <form class="builder-form" id="builderForm"></form>
 
         <div id="formButtons" style="display: flex; gap: 12px; justify-content: center; margin-top: 20px; flex-wrap: wrap;">
           <button type="button" id="loadSampleBtn" style="padding: 10px 20px; font-size: 14px; font-family: inherit; background: #fff; color: #2563EB; border: 1.5px solid #2563EB; border-radius: 8px; cursor: pointer;">예시 데이터 불러오기</button>
@@ -243,14 +212,35 @@
 
       <div id="chartButtons" style="display: none; gap: 12px; justify-content: center; margin-top: 20px; flex-wrap: wrap;">
         <button type="button" id="resetBtn" style="padding: 10px 20px; font-size: 14px; font-family: inherit; background: #fff; color: #2563EB; border: 1.5px solid #2563EB; border-radius: 8px; cursor: pointer;">다시 입력하기</button>
-        <button type="button" id="downloadBtn" style="padding: 10px 20px; font-size: 14px; font-family: inherit; background: #fff; color: #2563EB; border: 1.5px solid #2563EB; border-radius: 8px; cursor: pointer;">이미지로 저장</button>
       </div>
+
+      <section id="export-section" class="export-section" style="display: none;">
+        <h3 class="export-title">결과 내보내기</h3>
+        <div class="export-group">
+          <span class="export-group-label">이미지 다운로드</span>
+          <div class="export-btn-row">
+            <button type="button" class="export-btn export-btn-img" data-export="jpg">⬇ JPG로 저장</button>
+            <button type="button" class="export-btn export-btn-img" data-export="png">⬇ PNG로 저장</button>
+            <button type="button" class="export-btn export-btn-img" data-export="svg">⬇ SVG로 저장</button>
+          </div>
+        </div>
+        <div class="export-group">
+          <span class="export-group-label">구글 연동</span>
+          <div class="export-btn-row">
+            <button type="button" class="export-btn export-btn-sheets" data-export="sheets">📊 구글 시트로 보내기</button>
+            <button type="button" class="export-btn export-btn-docs" data-export="docs">📄 구글 독스로 보내기</button>
+          </div>
+        </div>
+      </section>
+
+      <div id="exportToast" class="export-toast" style="display: none;"></div>
     </section>
   </main>
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.6/dist/chart.umd.js"
     integrity="sha384-MH1axGwz/uQzfIcjFdjEfsM0xlf5mmWfAwwggaOh5IPFvgKFGbJ2PZ4VBbgSYBQN"
     crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <script src="data/charts.js"></script>
   <script src="js/thumbnails.js"></script>
   <script src="js/chart.js"></script>
